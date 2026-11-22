@@ -4411,7 +4411,11 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.0.0';
+const APP_VER='1.0.1';
+const CHANGELOG={'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+setTimeout(()=>{try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const gift=CHANGELOG[APP_VER];if(gift)addCrystals(100);persist();updCrys();
+  info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
+  const m=$('#v-menu');if(m&&!$('#appver')){m.insertAdjacentHTML('beforeend',`<p id="appver" class="note" style="text-align:center;opacity:.6;margin:18px 0 8px">Runenduell · Version ${APP_VER}</p>`)}},800);
 let INSTALL_EVT=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();INSTALL_EVT=e;const b=$('#btn-install');if(b)b.classList.remove('hidden')});
 function appToast(html,btns=[]){let t=$('#apptoast');if(!t){t=document.createElement('div');t.id='apptoast';document.body.appendChild(t)}
@@ -4423,7 +4427,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
     const ask=w=>appToast('✨ <b>Neues Update verfügbar!</b> Neue Karten oder Verbesserungen sind da.',[{l:'Jetzt aktualisieren',f:()=>w.postMessage('skip')},{l:'Später'}]);
     if(reg.waiting&&navigator.serviceWorker.controller)ask(reg.waiting);
     reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)ask(w)})});
-    let rl=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(rl)return;rl=true;if(!(G&&!G.over&&VIEW==='duell'))location.reload();else appToast('Update installiert – es wird nach dem Duell aktiv.',[{l:'Jetzt neu laden',f:()=>location.reload()}])});
+    const hadCtrl=!!navigator.serviceWorker.controller;let rl=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(rl||!hadCtrl)return;rl=true;if(!(G&&!G.over&&VIEW==='duell'))location.reload();else appToast('Update installiert – es wird nach dem Duell aktiv.',[{l:'Jetzt neu laden',f:()=>location.reload()}])});
     setInterval(()=>reg.update().catch(()=>{}),30*60*1000);
   }catch(e){console.warn('SW',e)}});
 }
