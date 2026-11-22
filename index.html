@@ -461,6 +461,11 @@ button.hcard:hover{border-color:#46b8ff}
 details.onl-card summary{cursor:pointer}
 @media (max-width:700px){.onl-row{grid-template-columns:1fr}}
 .svx{display:grid;gap:12px}.svb{background:#0006;border:1px solid #ffffff25;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}.svr{display:flex;gap:8px;flex-wrap:wrap}
+.fme{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 10px}.fme b{font:800 22px ui-monospace,monospace;letter-spacing:.12em;color:#c6ff3d}
+.fadd{display:flex;gap:8px;margin-bottom:10px}.fadd .inp{flex:1}
+.flist{display:flex;flex-direction:column;gap:6px}.frow{display:flex;align-items:center;gap:10px;background:#0006;border:1px solid #ffffff22;border-radius:10px;padding:8px 10px}
+.frow.on{border-color:#5cff8a66}.frow.duel{border-color:#ffb34766}.fdot{font-size:18px}.fnm{flex:1;display:flex;flex-direction:column}.fnm small{opacity:.7}
+.inv-pop{text-align:center}.inv-av{font-size:54px;display:block;animation:invPulse 1s ease-in-out infinite alternate}@keyframes invPulse{to{transform:scale(1.12)}}
 #apptoast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,150%);z-index:9999;background:#1c1338f2;border:1px solid #c6ff3d88;box-shadow:0 8px 30px #000a;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:92vw;transition:transform .35s;color:#fff}
 #apptoast.on{transform:translate(-50%,0)}
 </style>
@@ -483,7 +488,7 @@ details.onl-card summary{cursor:pointer}
       <div class="hcard" id="menu-bonus"></div>
       <button class="hcard" data-nav="pass"><span>🎖</span><div><b>Battle Pass</b><small id="menu-pass"></small></div></button>
       <button class="hcard" data-nav="truhen"><span>🎁</span><div><b>Truhen</b><small id="menu-chest"></small></div></button>
-      <button class="hcard" data-nav="online"><span>🌐</span><div><b>Online gegen Freunde</b><small>Live-Duell mit Raumcode</small></div></button>
+      <button class="hcard" data-nav="online"><span>🌐</span><div><b>Online gegen Freunde</b><small>Freunde einladen · Live-Duell</small></div></button>
       <button class="hcard" data-nav="turnier"><span>🏆</span><div><b>Turnier</b><small>8 Duellanten · 💎 400 Siegprämie</small></div></button>
       <button class="hcard" data-nav="shop"><span>💎</span><div><b>Shop</b><small>Neue Kartenpakete</small></div></button>
       <button class="hcard" data-nav="sammlung"><span>📚</span><div><b>Werkstatt</b><small id="menu-coll"></small></div></button>
@@ -2857,7 +2862,7 @@ function endDuel(winner,why){
   log(why);log(winner===0?'🏆 Du hast gewonnen!':'💀 Der Gegner hat gewonnen.');
   G.winner=winner;
   if(AUTO)return;
-  if(NET.on&&NET.role==='host'){netSnap();netSend({t:'over',winner,why})}
+  if(NET.on&&NET.role==='host'){netSnap();netSend({t:'over',winner,why});setTimeout(friendDuelEnded,1500)}
   render();
   const cfg=DUEL;
   setTimeout(async()=>{
@@ -4323,7 +4328,7 @@ function netMsg(m){
   if(m.t==='ask')return guestAsk(m);
   if(m.t==='fx')return fx(m.text,m.color);
   if(m.t==='ban')return phaseBanner(m.text,m.i);
-  if(m.t==='over'){const win=m.winner===1;netReward(win);setTimeout(async()=>{await modal({title:win?'🏆 Sieg!':'💀 Niederlage',body:`<p>${esc(swapTxt(m.why||''))}</p><p>${win?'Du hast deinen Freund besiegt!':'Dein Freund hat gewonnen.'} +💎 ${win?50:15}</p>`,buttons:[{label:'Weiter',value:1,cls:'pri'}]});go('online')},500)}
+  if(m.t==='over'){const win=m.winner===1;friendDuelEnded();netReward(win);setTimeout(async()=>{await modal({title:win?'🏆 Sieg!':'💀 Niederlage',body:`<p>${esc(swapTxt(m.why||''))}</p><p>${win?'Du hast deinen Freund besiegt!':'Dein Freund hat gewonnen.'} +💎 ${win?50:15}</p>`,buttons:[{label:'Weiter',value:1,cls:'pri'}]});go('online')},500)}
 }
 function netReward(win){addCrystals(win?50:15);addXP(win?80:30);if(win)SAVE.stats.wins++;else SAVE.stats.losses++;persist()}
 function netClosed(){
@@ -4379,11 +4384,11 @@ async function roomJoin(code){
     peer.on('error',e=>{onlineStatus(e.type==='peer-unavailable'?'Raum nicht gefunden. Stimmt der Code?':'Fehler: '+(e.type||e.message));rej(e)});
     peer.on('open',()=>{const c=peer.connect(roomId(code),{reliable:true,serialization:'raw'});c.on('open',()=>{bindChannel(wrapPJ(c));res()})})});
 }
-function netReset(){try{NET.peer&&NET.peer.destroy()}catch(e){}try{NET.pc&&NET.pc.close()}catch(e){}Object.assign(NET,{on:false,role:null,ch:null,pend:{},peer:null,pc:null,logN:0,started:false})}
+function netReset(){try{NET.peer&&NET.peer.destroy()}catch(e){}try{NET.pc&&NET.pc.close()}catch(e){}Object.assign(NET,{on:false,role:null,ch:null,pend:{},peer:null,pc:null,logN:0,started:false,viaCode:null})}
 /* --- Lobby --- */
 function onlineStatus(t){const e=$('#on-status');if(e)e.textContent=t}
 function renderOnline(){
-  $('#online').innerHTML=`<div class="onl">
+  $('#online').innerHTML=`<div class="onl">${friendsHTML()}
    <div class="panel onl-card"><h3>🌐 Online gegen Freunde</h3><p class="note">Spiele live gegen einen Freund – jeder mit seinem eigenen Deck (deinem aktiven Deck <b>${esc((curDeck()||{}).name||'')}</b>). Kein Konto nötig, nur Internet.</p>
     <label class="note">Dein Name</label><input id="on-name" class="inp" maxlength="20" value="${esc(prof().name||'Duellant')}">
     <div class="onl-row"><div class="onl-box"><b>1. Raum erstellen</b><p class="note">Du bekommst einen Code, den du deinem Freund schickst.</p><button class="btn pri" id="on-host">Raum erstellen</button><div id="on-code" class="onl-code"></div></div>
@@ -4411,10 +4416,10 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.0.1';
-const CHANGELOG={'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
-setTimeout(()=>{try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const gift=CHANGELOG[APP_VER];if(gift)addCrystals(100);persist();updCrys();
-  info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
+const APP_VER='1.0.2';
+const CHANGELOG={'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+setTimeout(()=>{try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const st=SAVE.stats||{},old=!!v||(st.wins||0)+(st.losses||0)+(st.packs||0)>0;const gift=old&&CHANGELOG[APP_VER];if(gift)addCrystals(100);persist();updCrys();
+  if(old)info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
   const m=$('#v-menu');if(m&&!$('#appver')){m.insertAdjacentHTML('beforeend',`<p id="appver" class="note" style="text-align:center;opacity:.6;margin:18px 0 8px">Runenduell · Version ${APP_VER}</p>`)}},800);
 let INSTALL_EVT=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();INSTALL_EVT=e;const b=$('#btn-install');if(b)b.classList.remove('hidden')});
@@ -4459,6 +4464,120 @@ async function saveTransfer(){
   if(done){await info('✅ Geladen!','<p>Dein Spielstand wurde übernommen.</p>');go('menu')}
 }
 document.addEventListener('click',e=>{if(e.target.closest('#btn-install'))installApp();if(e.target.closest('#btn-save'))saveTransfer()});
+/* ---------- Freunde: Online-Status & Einladungen ---------- */
+const PRES={peer:null,ready:false,conns:{},status:{},names:{},timer:null,inv:null,incoming:null};
+const FPRE='runenduell-u1-';
+function myCode(){if(!SAVE.friendCode){SAVE.friendCode=Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[rand(32)]).join('');persist()}return SAVE.friendCode}
+const friends=()=>(SAVE.friends=SAVE.friends||[]);
+const fCode=id=>String(id||'').replace(FPRE,'');
+function myStatus(){return NET.on?'duel':'online'}
+function presSend(code,o){const c=PRES.conns[code];try{c&&c.open&&c.send(JSON.stringify(o))}catch(e){}}
+function presBroadcast(){for(const k in PRES.conns)presSend(k,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus()})}
+function presAttach(c){
+  const code=fCode(c.peer);
+  c.on('open',()=>{const old=PRES.conns[code];if(old&&old!==c&&old.open){try{c.close()}catch(e){}return}PRES.conns[code]=c;presSend(code,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus()});renderFriendsSoft()});
+  c.on('data',d=>{let m;try{m=JSON.parse(d)}catch(e){return}
+    if(m.t&&(m.t.startsWith('p-')||m.t.startsWith('inv')))return presMsg(code,m);
+    if(NET.on&&NET.viaCode===code&&NET.ch&&NET.ch.onmsg)NET.ch.onmsg(d)});
+  const gone=()=>{if(PRES.conns[code]===c){delete PRES.conns[code];PRES.status[code]='off';renderFriendsSoft();if(NET.on&&NET.viaCode===code)netClosed()}};
+  c.on('close',gone);c.on('error',gone);
+}
+function presMsg(code,m){
+  if(m.t==='p-hello'){PRES.status[code]=m.st||'online';PRES.names[code]=m.name;
+    const f=friends().find(x=>x.code===code);if(f){if(m.name&&f.name!==m.name){f.name=m.name;persist()}}
+    else{friends().push({code,name:m.name||code});persist();appToast(`👋 <b>${esc(m.name||code)}</b> hat dich als Freund hinzugefügt!`,[{l:'OK'}])}
+    renderFriendsSoft();return}
+  if(m.t==='p-st'){PRES.status[code]=m.st;renderFriendsSoft();return}
+  if(m.t==='inv')return gotInvite(code,m);
+  if(m.t==='inv-no'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('no');return}
+  if(m.t==='inv-busy'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('busy');return}
+  if(m.t==='inv-yes'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('yes');return}
+  if(m.t==='inv-cancel'&&PRES.incoming===code){PRES.incoming=null;if(modalResolve)modalResolve('cancel');appToast('Die Einladung wurde zurückgezogen.',[{l:'OK'}])}
+}
+function presStart(){
+  if(PRES.peer||!navigator.onLine||/claude\.ai|claudeusercontent/.test(location.host))return;
+  loadPeerJS().then(()=>{
+    const peer=new Peer(FPRE+myCode(),{config:ICE});PRES.peer=peer;
+    peer.on('open',()=>{PRES.ready=true;renderFriendsSoft();presPoll();PRES.timer=setInterval(presPoll,20000)});
+    peer.on('connection',c=>presAttach(c));
+    peer.on('error',e=>{if(e.type==='unavailable-id'){PRES.ready=false;PRES.err='Das Spiel ist schon in einem anderen Fenster offen.'}else if(e.type==='peer-unavailable'){}else PRES.err=e.type;renderFriendsSoft()});
+    peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
+  }).catch(()=>{PRES.err='Keine Verbindung zum Freundesdienst.';renderFriendsSoft()});
+}
+function presPoll(){
+  if(!PRES.ready)return;
+  for(const f of friends()){
+    const c=PRES.conns[f.code];if(c&&c.open)continue;
+    if(PRES.status[f.code]==='trying')continue;PRES.status[f.code]=PRES.status[f.code]==='off'||!PRES.status[f.code]?'off':PRES.status[f.code];
+    try{const nc=PRES.peer.connect(FPRE+f.code,{reliable:true,serialization:'raw'});presAttach(nc);
+      setTimeout(()=>{if(!nc.open){try{nc.close()}catch(e){}if(PRES.conns[f.code]!==nc){PRES.status[f.code]='off';renderFriendsSoft()}}},8000)}catch(e){}
+  }
+}
+async function inviteFriend(code){
+  const f=friends().find(x=>x.code===code);if(!f)return;
+  if(!(PRES.conns[code]&&PRES.conns[code].open))return info('Nicht online',`<p>${esc(f.name)} ist gerade nicht online.</p>`);
+  if(PRES.status[code]==='duel')return info('Im Duell',`<p>${esc(f.name)} ist gerade in einem Duell. Versuch es gleich nochmal.</p>`);
+  presSend(code,{t:'inv',name:prof().name||'Duellant',deck:(curDeck()||{}).name||''});
+  const ans=await new Promise(res=>{PRES.inv={code,res};
+    const to=setTimeout(()=>res('timeout'),30000);
+    modal({title:'⚔️ Einladung gesendet',body:`<p>Warte auf <b>${esc(f.name)}</b> …</p><p class="note">Die Einladung läuft nach 30 Sekunden ab.</p>`,buttons:[{label:'Abbrechen',value:'cancel'}],dismiss:'cancel'}).then(v=>{if(v==='cancel')res('cancel')});
+    PRES.inv.done=()=>clearTimeout(to)});
+  PRES.inv.done&&PRES.inv.done();PRES.inv=null;if(modalResolve)modalResolve(null);
+  if(ans==='cancel'){presSend(code,{t:'inv-cancel'});return}
+  if(ans==='no')return info('Abgelehnt',`<p>${esc(f.name)} hat die Einladung abgelehnt.</p>`);
+  if(ans==='busy')return info('Gerade beschäftigt',`<p>${esc(f.name)} ist gerade beschäftigt. Versuch es gleich nochmal.</p>`);
+  if(ans==='timeout'){presSend(code,{t:'inv-cancel'});return info('Keine Antwort',`<p>${esc(f.name)} hat nicht geantwortet.</p>`)}
+  startFriendDuel(code,'host');
+}
+async function gotInvite(code,m){
+  const busy=NET.on||(G&&!G.over&&VIEW==='duell')||PRES.incoming;
+  if(busy){presSend(code,{t:'inv-busy'});return}
+  PRES.incoming=code;
+  const v=await modal({title:'⚔️ Duell-Einladung!',body:`<div class="inv-pop"><span class="inv-av">🌐</span><p><b>${esc(m.name||code)}</b> fordert dich zu einem Duell heraus!</p><p class="note">Du spielst mit deinem aktiven Deck <b>${esc((curDeck()||{}).name||'')}</b>.</p></div>`,
+    buttons:[{label:'❌ Ablehnen',value:'no'},{label:'⚔️ Annehmen',value:'yes',cls:'pri'}],dismiss:'no'});
+  if(PRES.incoming!==code)return;PRES.incoming=null;
+  if(v==='cancel')return;
+  if(v!=='yes'){presSend(code,{t:'inv-no'});return}
+  presSend(code,{t:'inv-yes'});startFriendDuel(code,'guest');
+}
+function startFriendDuel(code,role){
+  const c=PRES.conns[code];if(!c||!c.open)return info('Verbindung verloren','<p>Die Verbindung zu deinem Freund ist abgebrochen.</p>');
+  try{NET.peer&&NET.peer.destroy()}catch(e){}
+  Object.assign(NET,{on:false,role,ch:null,pend:{},peer:null,pc:null,logN:0,started:false,viaCode:code});
+  NET.oppName=(friends().find(x=>x.code===code)||{}).name||'Freund';
+  const ch={send:s=>c.open&&c.send(s),onmsg:null};
+  bindChannel(ch);presBroadcast();
+  if(role==='guest'){$('#log')&&($('#log').innerHTML='')}
+}
+function friendDuelEnded(){if(NET.viaCode){NET.on=false;NET.viaCode=null;setTimeout(presBroadcast,300)}}
+function addFriend(code){
+  code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length!==6)return info('Ungültiger Code','<p>Ein Freundescode hat 6 Zeichen, z. B. <b>K7Q2MX</b>.</p>');
+  if(code===myCode())return info('Das bist du','<p>Das ist dein eigener Freundescode 😄</p>');
+  if(friends().some(f=>f.code===code))return info('Schon da','<p>Dieser Freund ist schon in deiner Liste.</p>');
+  friends().push({code,name:'Freund '+code});persist();presPoll();renderOnline();
+}
+function friendsHTML(){
+  const st=c=>{const s=PRES.status[c];return s==='duel'?['⚔️','Im Duell','duel']:(PRES.conns[c]&&PRES.conns[c].open)?['🟢','Online','on']:['⚪','Offline','off']};
+  const list=friends().map(f=>{const [ic,tx,cl]=st(f.code);return `<div class="frow ${cl}"><span class="fdot">${ic}</span><div class="fnm"><b>${esc(PRES.names[f.code]||f.name)}</b><small>${tx} · ${f.code}</small></div>
+    <button class="btn pri sm" data-finv="${f.code}" ${cl==='on'?'':'disabled'}>⚔️ Einladen</button><button class="btn sm" data-fdel="${f.code}">✕</button></div>`}).join('');
+  return `<div class="panel onl-card" id="friends-box"><h3>👥 Freunde</h3>
+   <div class="fme">Dein Freundescode: <b>${myCode()}</b> <button class="btn sm" id="f-copy">📋 Kopieren</button>
+   <span class="note">${PRES.ready?'🟢 Du bist online – Freunde sehen dich.':PRES.err?'⚠️ '+esc(PRES.err):'⏳ Verbinde mit dem Freundesdienst …'}</span></div>
+   <div class="fadd"><input id="f-code" class="inp" maxlength="8" placeholder="Freundescode eingeben" style="text-transform:uppercase"><button class="btn pri" id="f-add">➕ Hinzufügen</button></div>
+   <div class="flist">${list||'<p class="note">Noch keine Freunde. Schick deinem Freund deinen Code oder gib seinen Code oben ein. Ihr müsst euch nur einmal hinzufügen.</p>'}</div>
+   <p class="note">Wenn ein Freund das Spiel geöffnet hat, siehst du ihn hier als 🟢 Online und kannst ihn zum Duell einladen.</p></div>`;
+}
+function renderFriendsSoft(){const b=$('#friends-box');if(b&&VIEW==='online')b.outerHTML=friendsHTML()}
+document.addEventListener('click',async e=>{
+  if(e.target.closest('#f-add'))return addFriend($('#f-code').value);
+  if(e.target.closest('#f-copy')){try{await navigator.clipboard.writeText(myCode());appToast('Freundescode kopiert!',[{l:'OK'}])}catch(_){info('Dein Freundescode',`<p style="font-size:28px;text-align:center"><b>${myCode()}</b></p>`)}return}
+  const iv=e.target.closest('[data-finv]');if(iv&&!iv.disabled)return inviteFriend(iv.dataset.finv);
+  const dl=e.target.closest('[data-fdel]');if(dl){const f=friends().find(x=>x.code===dl.dataset.fdel);const ok=await modal({title:'Freund entfernen?',body:`<p>${esc(f?f.name:'')} aus deiner Liste entfernen?</p>`,buttons:[{label:'Nein',value:0},{label:'Entfernen',value:1,cls:'pri'}],dismiss:0});
+    if(ok){SAVE.friends=friends().filter(x=>x.code!==dl.dataset.fdel);persist();try{PRES.conns[dl.dataset.fdel]&&PRES.conns[dl.dataset.fdel].close()}catch(_){}renderOnline()}}
+});
+setTimeout(presStart,2500);
+
 async function resetGame(){
   const r=await modal({title:'⚙️ Einstellungen',body:`<p>Hier kannst du dein ganzes Spiel <b>von vorne beginnen</b>.</p><p class="note">Dabei wird alles gelöscht: Karten, Decks, Kristalle, Splitter, Truhen, Geschichte, Battle Pass und Statistiken. Du startest wieder mit dem Starterdeck.</p>`,
     buttons:[{label:'Abbrechen',value:0},{label:'🔄 Spiel zurücksetzen',value:1,cls:'pri'}],dismiss:0});
