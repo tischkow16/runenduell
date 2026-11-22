@@ -489,6 +489,11 @@ details.onl-card summary{cursor:pointer}
 .avopt{aspect-ratio:1;border-radius:50%;border:2px solid #ffffff30;background:#0008;font-size:24px;cursor:pointer;position:relative;overflow:hidden;padding:0;container-type:size}
 .avopt.img>.spr{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max(100cqw,125cqh);height:auto;aspect-ratio:5/4}.avopt:hover{border-color:#f2c14e}
 @media (max-width:600px){.pf-stats{grid-template-columns:repeat(3,1fr)}}
+.online-count{display:inline-flex;align-items:center;gap:7px;font:600 13px system-ui;background:#0009;border:1px solid #ffffff25;border-radius:999px;padding:5px 12px}
+.oc-home{margin:0 0 10px}.oc-big{font-size:15px;padding:8px 16px;justify-self:start}
+.oc-dot{width:9px;height:9px;border-radius:50%;background:#4cff7a;box-shadow:0 0 8px #4cff7a;animation:ocP 1.6s ease-in-out infinite}.oc-dot.off{background:#888;box-shadow:none;animation:none}
+@keyframes ocP{50%{opacity:.4}}
+.owon{background:#0006;border-radius:10px;padding:10px;margin:8px 0}.ochips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ochip{background:#ffffff14;border-radius:999px;padding:3px 10px;font-size:12px}
 #apptoast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,150%);z-index:9999;background:#1c1338f2;border:1px solid #c6ff3d88;box-shadow:0 8px 30px #000a;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:92vw;transition:transform .35s;color:#fff}
 #apptoast.on{transform:translate(-50%,0)}
 </style>
@@ -503,6 +508,7 @@ details.onl-card summary{cursor:pointer}
 <div id="subtabs" class="subtabs"></div>
 
 <section id="v-menu" class="view on">
+  <div class="online-count oc-home"><span class="oc-dot off"></span>Online-Zähler verbindet …</div>
   <div class="home">
     <div class="banner" id="banner">
       <div class="bn-in"><small>📖 GESCHICHTE</small><b id="bn-t"></b><span id="bn-s"></span><button class="btn pri big" data-nav="geschichte">Weiterspielen ▶</button></div>
@@ -4477,8 +4483,8 @@ async function roomJoin(code){
 function netReset(){try{NET.peer&&NET.peer.destroy()}catch(e){}try{NET.pc&&NET.pc.close()}catch(e){}Object.assign(NET,{on:false,role:null,ch:null,pend:{},peer:null,pc:null,logN:0,started:false,viaCode:null})}
 /* --- Lobby --- */
 function onlineStatus(t){const e=$('#on-status');if(e)e.textContent=t}
-function renderOnline(){
-  $('#online').innerHTML=`<div class="onl">${friendsHTML()}
+function renderOnline(){setTimeout(renderOnlineCount,0);
+  $('#online').innerHTML=`<div class="onl"><div class="online-count oc-big"></div>${friendsHTML()}
    <div class="panel onl-card"><h3>🌐 Online gegen Freunde</h3><p class="note">Spiele live gegen einen Freund – jeder mit seinem eigenen Deck (deinem aktiven Deck <b>${esc((curDeck()||{}).name||'')}</b>). Kein Konto nötig, nur Internet.</p>
     <label class="note">Dein Name</label><input id="on-name" class="inp" maxlength="20" value="${esc(prof().name||'Duellant')}">
     <div class="onl-row"><div class="onl-box"><b>1. Raum erstellen</b><p class="note">Du bekommst einen Code, den du deinem Freund schickst.</p><button class="btn pri" id="on-host">Raum erstellen</button><div id="on-code" class="onl-code"></div></div>
@@ -4506,8 +4512,8 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.0.3';
-const CHANGELOG={'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+const APP_VER='1.0.4';
+const CHANGELOG={'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
 setTimeout(()=>{try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const st=SAVE.stats||{},old=!!v||(st.wins||0)+(st.losses||0)+(st.packs||0)>0;const gift=old&&CHANGELOG[APP_VER];if(gift)addCrystals(100);persist();updCrys();
   if(old)info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
   const m=$('#v-menu');if(m&&!$('#appver')){m.insertAdjacentHTML('beforeend',`<p id="appver" class="note" style="text-align:center;opacity:.6;margin:18px 0 8px">Runenduell · Version ${APP_VER}</p>`)}},800);
@@ -4562,7 +4568,7 @@ const friends=()=>(SAVE.friends=SAVE.friends||[]);
 const fCode=id=>String(id||'').replace(FPRE,'');
 function myStatus(){return NET.on?'duel':'online'}
 function presSend(code,o){const c=PRES.conns[code];try{c&&c.open&&c.send(JSON.stringify(o))}catch(e){}}
-function presBroadcast(){for(const k in PRES.conns)presSend(k,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null})}
+function presBroadcast(){hubUpdateMe();for(const k in PRES.conns)presSend(k,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null})}
 function presAttach(c){
   const code=fCode(c.peer);
   c.on('open',()=>{const old=PRES.conns[code];if(old&&old!==c&&old.open){try{c.close()}catch(e){}return}PRES.conns[code]=c;presSend(code,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null});renderFriendsSoft()});
@@ -4588,7 +4594,7 @@ function presStart(){
   if(PRES.peer||!navigator.onLine||/claude\.ai|claudeusercontent/.test(location.host))return;
   loadPeerJS().then(()=>{
     const peer=new Peer(FPRE+myCode(),{config:ICE});PRES.peer=peer;
-    peer.on('open',()=>{PRES.ready=true;renderFriendsSoft();presPoll();PRES.timer=setInterval(presPoll,20000)});
+    peer.on('open',()=>{PRES.ready=true;renderFriendsSoft();presPoll();PRES.timer=setInterval(presPoll,20000);setTimeout(hubTick,300+rand(1500))});
     peer.on('connection',c=>presAttach(c));
     peer.on('error',e=>{if(e.type==='unavailable-id'){PRES.ready=false;PRES.err='Das Spiel ist schon in einem anderen Fenster offen.'}else if(e.type==='peer-unavailable'){}else PRES.err=e.type;renderFriendsSoft()});
     peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
@@ -4706,7 +4712,7 @@ async function pickAvatar(){
   if(chosen){Object.assign(prof(),chosen);persist();renderProfile();try{presBroadcast()}catch(e){}if(VIEW==='profil')renderProfil()}
 }
 let OWN_Q='';
-function renderProfil(){
+function renderProfil(){setTimeout(renderOnlineCount,0);
   const pf=prof(),lv=plLevel(),pr=prestige(),x=lv>=LV_MAX?100:(pf.xp%XP_LV)/XP_LV*100,st=SAVE.stats||{};
   const total=STARTER.length,have=STARTER.filter(c=>own(c.id)>0).length,[ri,rn]=RANKN[rankOf()];
   const found=OWN_Q.length>=2?STARTER.filter(c=>c.name.toLowerCase().includes(OWN_Q.toLowerCase())).slice(0,30):[];
@@ -4719,6 +4725,7 @@ function renderProfil(){
     <p class="note">Freundescode: <b>${myCode()}</b></p></div>
    ${SAVE.ownerUnlocked?`<div class="panel pf-card own"><h3>👑 Owner-Bereich</h3><p class="note">Du bist der Owner von Runenduell. Wechsle jederzeit zwischen deinem Owner-Konto (alles unbegrenzt) und deinem normalen Spieler-Spielstand.</p>
      <div class="modesw"><button class="${isOwnerMode()?'on':''}" data-mode="owner">👑 Owner</button><button class="${!isOwnerMode()?'on':''}" data-mode="player">🎮 Spieler</button></div>
+     <div class="owon"><b>🌍 Gerade online:</b> <span class="online-count"></span><div id="ow-online" class="ochips"></div></div>
      ${isOwnerMode()?`<div class="owtools"><p><b>∞ Kristalle & Splitter</b> sind im Owner-Modus immer voll.</p>
        <div class="svr"><button class="btn pri" id="ow-all">🃏 Alle Karten freischalten (je 3×)</button><button class="btn" id="ow-story">📖 Geschichte freischalten</button><button class="btn" id="ow-xp">⭐ +10 Level</button></div>
        <label class="note">Karte suchen und geben:</label><input id="ow-q" class="inp" value="${esc(OWN_Q)}" placeholder="Kartenname …">
@@ -4738,6 +4745,41 @@ $('#profil').addEventListener('click',async e=>{
   if(t.closest('#ow-xp')){addXP(XP_LV*10);return renderProfil()}
   const g=t.closest('[data-owg]');if(g){const id=g.dataset.owg;SAVE.owned[id]=Math.min(3,(SAVE.owned[id]||0)+(+g.dataset.n));persist();fx('+ '+getCard(id).name,'#ffd54f');renderProfil()}
 });
+
+/* ---------- Spieler online zählen (Hub ohne Server) ---------- */
+const HUB_ID='runenduell-hub-v1';
+const HUB={peer:null,members:new Map(),conn:null,count:0,names:[],isHub:false,connecting:false};
+function hubJoinMsg(){return JSON.stringify({t:'h-join',name:prof().name||'Duellant',code:myCode(),rank:rankOf()})}
+function hubTick(){if(!PRES.ready||HUB.connecting||(HUB.conn&&HUB.conn.open))return;hubConnect()}
+function hubConnect(){
+  HUB.connecting=true;let ok=false;let c;
+  try{c=PRES.peer.connect(HUB_ID,{reliable:true,serialization:'raw'})}catch(e){HUB.connecting=false;return}
+  c.on('open',()=>{ok=true;HUB.connecting=false;HUB.conn=c;try{c.send(hubJoinMsg())}catch(e){}});
+  c.on('data',d=>{let m;try{m=JSON.parse(d)}catch(e){return}if(m.t==='h-count'){HUB.count=m.n;HUB.names=m.names||[];renderOnlineCount()}});
+  const gone=()=>{if(HUB.conn===c){HUB.conn=null;HUB.count=0;renderOnlineCount();setTimeout(hubTick,800+rand(2500))}};
+  c.on('close',gone);c.on('error',gone);
+  setTimeout(()=>{if(!ok){HUB.connecting=false;try{c.close()}catch(e){}hubClaim()}},5000);
+}
+function hubClaim(){
+  if(HUB.peer)return setTimeout(hubTick,1500);
+  let p;try{p=new Peer(HUB_ID,{config:ICE})}catch(e){return}HUB.peer=p;
+  p.on('open',()=>{HUB.isHub=true;hubConnect()});
+  p.on('connection',c=>{
+    c.on('open',()=>{HUB.members.set(c,HUB.members.get(c)||{name:'Spieler'});hubSend()});
+    c.on('data',d=>{let m;try{m=JSON.parse(d)}catch(e){return}if(m.t==='h-join'){HUB.members.set(c,{name:String(m.name||'Spieler').slice(0,20),code:m.code,rank:m.rank});hubSend()}});
+    const gone=()=>{if(HUB.members.delete(c))hubSend()};c.on('close',gone);c.on('error',gone)});
+  p.on('error',e=>{if(e.type==='unavailable-id'){try{p.destroy()}catch(_){}HUB.peer=null;HUB.isHub=false;setTimeout(hubTick,1500+rand(2000))}});
+  p.on('disconnected',()=>{try{p.reconnect()}catch(_){}});
+}
+function hubSend(){const L=[...HUB.members.values()];const msg=JSON.stringify({t:'h-count',n:L.length,names:L.map(x=>(x.rank==='owner'?'👑 ':'')+x.name).slice(0,200)});
+  for(const c of HUB.members.keys())try{c.open&&c.send(msg)}catch(e){}}
+function hubUpdateMe(){try{HUB.conn&&HUB.conn.open&&HUB.conn.send(hubJoinMsg())}catch(e){}}
+function renderOnlineCount(){
+  const n=HUB.count,t=n?`<span class="oc-dot"></span><b>${n}</b> Spieler online`:'<span class="oc-dot off"></span>Online-Zähler verbindet …';
+  document.querySelectorAll('.online-count').forEach(e=>e.innerHTML=t);
+  const ol=$('#ow-online');if(ol)ol.innerHTML=HUB.names.length?HUB.names.map(x=>`<span class="ochip">${esc(x)}</span>`).join(''):'<span class="note">Gerade niemand online.</span>';
+}
+setInterval(hubTick,15000);
 
 async function resetGame(){
   const r=await modal({title:'⚙️ Einstellungen',body:`<p>Hier kannst du dein ganzes Spiel <b>von vorne beginnen</b>.</p><p class="note">Dabei wird alles gelöscht: Karten, Decks, Kristalle, Splitter, Truhen, Geschichte, Battle Pass und Statistiken. Du startest wieder mit dem Starterdeck.</p>`,
