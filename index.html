@@ -4046,7 +4046,7 @@ function renderColl(){
     +sel('sort','Sortieren',[['','Standard'],['name','Name A–Z'],['atk','ATK ↓'],['def','DEF ↓'],['lv','Stufe ↓'],['rar','Seltenheit ↓'],['own','Besitz ↓']])
     +(anyF?`<button class="btn sm" id="cf-reset">✕ Filter zurücksetzen</button>`:'');
   $('#coll-rar').innerHTML=`<button class="btn sm ${collRar==='alle'?'vio':''}" data-r="alle">Alle Seltenheiten</button>`+Object.keys(RAR).map(r=>`<button class="btn sm ${collRar===r?'vio':''}" data-r="${r}">${dustIcon(r)} ${RAR[r][0]} <small>(${SAVE.dust[r]>=1e8?'∞':SAVE.dust[r]||0} Splitter)</small></button>`).join('')
-  const canCraft=c=>STARTER_IDS.has(c.id)&&own(c.id)<3&&(SAVE.dust[rarity(c)]||0)>=DUST_CRAFT;
+  const canCraft=c=>STARTER_IDS.has(c.id)&&!opCached(c)&&own(c.id)<3&&(SAVE.dust[rarity(c)]||0)>=DUST_CRAFT;
   const q=collQ.trim().toLowerCase();
   const stOK=c=>!CF.st||(CF.st==='ctrap'?c.kind==='trap'&&c.stype==='cont':CF.st==='counter'?c.kind==='trap'&&c.stype==='counter':collFilter==='trap'?c.kind==='trap'&&c.stype===CF.st:c.kind==='spell'&&(c.stype||'normal')===CF.st);
   const spOK=c=>!CF.sp||(CF.sp==='op'?opCached(c):CF.sp==='anti'?!!c.antiOP:CF.sp==='rainbow'?!!c.rainbow:CF.sp==='boss'?!!c.boss:CF.sp==='inf'?!!c.inf:true);
@@ -4058,7 +4058,7 @@ function renderColl(){
   const so={name:(a,b)=>a.name.localeCompare(b.name),atk:(a,b)=>(b.atk||0)-(a.atk||0),def:(a,b)=>(b.def||0)-(a.def||0),lv:(a,b)=>(b.level||0)-(a.level||0),rar:(a,b)=>RO[rarity(b)]-RO[rarity(a)],own:(a,b)=>own(b.id)-own(a.id)}[CF.sort];
   if(so)list=list.slice().sort(so);
   $('#coll-grid').innerHTML=`<p class="note cf-count">${list.length} Karte${list.length===1?'':'n'} gefunden</p>`+(list.length?`<div class="grid">${list.map(c=>{const k=own(c.id),r=rarity(c);
-    const craft=!STARTER_IDS.has(c.id)?'':k>=3?`<button class="btn sm" disabled>✓ 3× im Besitz</button>`:`<button class="btn sm pri craft" data-craft="${c.id}" ${canCraft(c)?'':'disabled'}>🔨 Herstellen ${dustIcon(r)} ${DUST_CRAFT}</button>`;
+    const craft=!STARTER_IDS.has(c.id)?'':opCached(c)?(k>=3?`<button class="btn sm" disabled>✓ 3× im Besitz</button>`:`<button class="btn sm" disabled title="Nur über die Goldene Ziehung">🟡 Nur Goldene Ziehung</button>`):k>=3?`<button class="btn sm" disabled>✓ 3× im Besitz</button>`:`<button class="btn sm pri craft" data-craft="${c.id}" ${canCraft(c)?'':'disabled'}>🔨 Herstellen ${dustIcon(r)} ${DUST_CRAFT}</button>`;
     return `<div class="gi ${k?'':'locked'}">${cardHTML(c,{size:'g',attrs:`data-zoom="${c.id}"`})}<div class="ctl"><b style="min-width:0">${k?'Besitz: '+k+'×':'🔒 Nicht im Besitz'}</b></div>${craft}${cardBtns(c)}</div>`}).join('')}</div>`:'<p class="note">Keine Karten gefunden. Probiere andere Filter.</p>');
 }
 $('#coll-adv').addEventListener('change',e=>{const k=e.target.dataset.cf;if(k){CF[k]=e.target.value;renderColl()}});
@@ -4152,7 +4152,7 @@ const ALL_PACKS=()=>[...PACKS,...THEME_PACKS,SPECIAL_PACK];
 const DAY=864e5,weekNo=()=>Math.floor((Date.now()/DAY+3)/7),weekLeft=()=>{const e=(weekNo()+1)*7-3;return Math.max(1,Math.ceil(e-Date.now()/DAY))};
 const featuredPacks=()=>[0,1,2].map(k=>THEME_PACKS[(weekNo()*3+k)%THEME_PACKS.length]);
 const pct=x=>(Math.round(x*1000)/10).toString().replace('.',',')+' %';
-const packPool=p=>{const pl=STARTER.filter(c=>!c.token&&p.f(c));return pl.length>=10?pl:STARTER.filter(c=>!c.token)};
+const packPool=p=>{const pl=STARTER.filter(c=>!c.token&&!opCached(c)&&p.f(c));return pl.length>=10?pl:STARTER.filter(c=>!c.token&&!opCached(c))};
 const RANKR={ultra:3,super:2,selten:1,normal:0};
 const packHighlights=(p,n=5)=>{const pl=packPool(p).filter(c=>c.img);return pl.sort((a,b)=>RANKR[rarity(b)]-RANKR[rarity(a)]||(b.atk||0)-(a.atk||0)||a.name.localeCompare(b.name)).slice(0,n)};
 const jubiLeft=()=>{SAVE.shopLim=SAVE.shopLim||{};return SPECIAL_PACK.limit-(SAVE.shopLim['jubi'+weekNo()]||0)};
@@ -4202,7 +4202,7 @@ async function openPacks(p,count=1){
   for(let k=0;k<count*5;k++)rs.push(rollRar(p.odds[k%5<4?0:1]));
   if(count>=10&&!rs.some(r=>r==='super'||r==='ultra'))rs[rs.length-1]='super';
   if(p.special)rs.push('ultra');
-  const res=rs.map(r=>{let cands=pool.filter(c=>rarity(c)===r);if(!cands.length)cands=STARTER.filter(c=>!c.token&&rarity(c)===r);if(!cands.length)cands=pool;
+  const res=rs.map(r=>{let cands=pool.filter(c=>rarity(c)===r);if(!cands.length)cands=STARTER.filter(c=>!c.token&&!opCached(c)&&rarity(c)===r);if(!cands.length)cands=pool;
     const c=getCard(cands[rand(cands.length)].id);const before=own(c.id);let refund=0;if(before>=3){refund=DUST_GET;addDust(rarity(c),DUST_GET)}else SAVE.owned[c.id]=before+1;return {c,r:rarity(c),isNew:before===0,refund}});
   SAVE.stats.packs+=count;persist();updCrys();
   const N=res.length,small=N>6;let shown=0;
@@ -4418,6 +4418,7 @@ $('#tour').addEventListener('click',e=>{
    Karte groß ansehen (Sammlung & Decks)
    ========================================================= */
 function craftCard(id){const c=getCard(id);const r=rarity(c);
+  if(opCached(c)){info('🟡 Nur über die Goldene Ziehung','<p>OP-Karten kann man nicht mehr herstellen. Du bekommst sie nur noch über die <b>🟡 Goldene Ziehung</b> (Shop → Token & Spezial).</p>');return false}
   if(own(id)>=3||(SAVE.dust[r]||0)<DUST_CRAFT)return false;
   SAVE.dust[r]-=DUST_CRAFT;SAVE.owned[id]=own(id)+1;persist();updCrys();fx('🔨 Hergestellt!',RAR[r][1]);return true}
 function dismantleCard(id){const c=getCard(id);const r=rarity(c);if(own(id)<1)return false;
@@ -4469,7 +4470,7 @@ const fmtT=ms=>{const s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3
 const skipCost=ch=>Math.max(5,Math.ceil(chestLeft(ch)/MIN));
 const unlocking=()=>(SAVE.chests||[]).find(c=>c.start&&chestLeft(c)>0);
 function giveCard(r){
-  let cands=STARTER.filter(c=>rarity(c)===r);if(!cands.length)cands=STARTER;
+  let cands=STARTER.filter(c=>!c.token&&!opCached(c)&&rarity(c)===r);if(!cands.length)cands=STARTER.filter(c=>!c.token&&!opCached(c));
   const c=cands[rand(cands.length)],before=own(c.id);let refund=0;
   if(before>=3){refund=DUST_GET;addDust(r,DUST_GET)}else SAVE.owned[c.id]=before+1;
   return {c,r:rarity(c),isNew:before===0,refund};
@@ -5064,8 +5065,8 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.1.1';
-const CHANGELOG={'1.1.1':['📖 Neues Tor: „Die verfluchten Sandgräber“ – besiege Nekharion (💎 100 + exklusiver Fluch-Avatar)'],'1.1.0':['☠ 60 neue Fluch-Karten mit neuer Mechanik: Fluchmarken (☠ auf den Monstern)','Effekt-Monster, Empfänger, Fusion, Xyz/Rang, Zauber & Fallen','Update-Geschenk: 💎 100 Kristalle'],'1.0.9':['🧪 Test-Update: Der Update-Knopf funktioniert!','Update-Geschenk: 💎 100 Kristalle'],'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+const APP_VER='1.1.2';
+const CHANGELOG={'1.1.2':['⚖️ OP-Karten (rotes OP-Zeichen) gibt es nur noch über die 🟡 Goldene Ziehung','🔨 OP-Karten können nicht mehr mit Splittern hergestellt werden','📦 Pakete, Truhen, OP-Kiste und Regenbogen-Kiste geben stattdessen starke, normale Karten','Karten, die du schon besitzt, bleiben natürlich erhalten'],'1.1.1':['📖 Neues Tor: „Die verfluchten Sandgräber“ – besiege Nekharion (💎 100 + exklusiver Fluch-Avatar)'],'1.1.0':['☠ 60 neue Fluch-Karten mit neuer Mechanik: Fluchmarken (☠ auf den Monstern)','Effekt-Monster, Empfänger, Fusion, Xyz/Rang, Zauber & Fallen','Update-Geschenk: 💎 100 Kristalle'],'1.0.9':['🧪 Test-Update: Der Update-Knopf funktioniert!','Update-Geschenk: 💎 100 Kristalle'],'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
 setTimeout(()=>{try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const st=SAVE.stats||{},old=!!v||(st.wins||0)+(st.losses||0)+(st.packs||0)>0;const gift=old&&CHANGELOG[APP_VER];if(gift)addCrystals(100);persist();updCrys();
   if(old)info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
   const m=$('#v-menu');if(m&&!$('#appver')){m.insertAdjacentHTML('beforeend',`<p id="appver" class="note" style="text-align:center;opacity:.6;margin:18px 0 8px">Runenduell · Version ${APP_VER}</p>`)}},800);
@@ -5346,7 +5347,7 @@ const TOKB_PRICE=2000,TOKG_PRICE=100000;
 const tokB=()=>SAVE.tokB||0,tokG=()=>SAVE.tokG||0;
 const CASE_PRIZES=[
   {k:'gold',w:0.1,t:'Goldener Token',ic:'🟡',col:'#ffd700'},
-  {k:'card',w:4.9,t:'OP-Karte',ic:'🃏',col:'#ff3b3b'},
+  {k:'card',w:4.9,t:'Starke Karte',ic:'🃏',col:'#ff3b3b'},
   {k:'c1000',w:5,t:'1000 Kristalle',ic:'💎',col:'#ff4fd8'},
   {k:'c500',w:10,t:'500 Kristalle',ic:'💎',col:'#a24bff'},
   {k:'c300',w:15,t:'300 Kristalle',ic:'💎',col:'#4b69ff'},
@@ -5356,10 +5357,11 @@ const CASE_PRIZES=[
 ];
 function rollPrize(){let x=Math.random()*100;for(const p of CASE_PRIZES){if((x-=p.w)<0)return p}return CASE_PRIZES[CASE_PRIZES.length-1]}
 const opPool=()=>STARTER.filter(c=>!c.token&&opCached(c));
+const strongPool=()=>STARTER.filter(c=>!c.token&&!opCached(c)&&(rarity(c)==='ultra'||rarity(c)==='super')&&(c.kind!=='monster'||(c.atk||0)>=2500));
 function giveCardTok(c){const before=own(c.id);if(before>=3){addDust(rarity(c),DUST_GET);return `bereits 3× im Besitz → +${DUST_GET} Splitter`}SAVE.owned[c.id]=before+1;return before?'':'NEU!'}
 function grantPrize(p){
   if(p.k==='gold'){SAVE.tokG=tokG()+1;return {html:'<b>🟡 1 Goldener Token!</b>'}}
-  if(p.k==='card'){const pool=opPool();const c=pool[rand(pool.length)];const note=giveCardTok(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
+  if(p.k==='card'){const pool=strongPool();const c=pool[rand(pool.length)];const note=giveCardTok(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
   if(p.k.startsWith('c')){const n=+p.k.slice(1);addCrystals(n);return {html:`<b>💎 ${n} Kristalle</b>`}}
   if(p.k==='u30'){addDust('ultra',30);return {html:'<b>30 Ultra-Splitter</b>'}}
   if(p.k==='n10'){addDust('normal',10);return {html:'<b>10 Normal-Splitter</b>'}}
@@ -5401,11 +5403,11 @@ async function buyToken(kind){
   const ok=await modal({title:'Token kaufen',body:`<p>${name} für <b>💎 ${price.toLocaleString('de-DE')}</b> kaufen?</p>`,buttons:[{label:'Abbrechen',value:0},{label:'Kaufen',value:1,cls:'pri'}],dismiss:0});if(!ok)return;
   SAVE.crystals-=price;if(kind==='g')SAVE.tokG=tokG()+1;else SAVE.tokB=tokB()+1;persist();updCrys();appToast(kind==='g'?'🟡 Goldener Token gekauft!':'🔷 Blauer Token gekauft!',[{l:'OK'}]);renderShop();
 }
-function caseOdds(){info('🔷 Chancen der OP-Kiste',`<table class="otab"><tr><th>Gewinn</th><th>Chance</th></tr>${CASE_PRIZES.map(p=>`<tr><td style="color:${p.col}">${p.ic} ${p.t}</td><td>${String(p.w).replace('.',',')} %</td></tr>`).join('')}</table><p class="note">Die OP-Karte ist zufällig aus allen ${opPool().length} OP-Karten. Hast du sie schon 3×, bekommst du Splitter.</p>`)}
+function caseOdds(){info('🔷 Chancen der OP-Kiste',`<table class="otab"><tr><th>Gewinn</th><th>Chance</th></tr>${CASE_PRIZES.map(p=>`<tr><td style="color:${p.col}">${p.ic} ${p.t}</td><td>${String(p.w).replace('.',',')} %</td></tr>`).join('')}</table><p class="note">Die starke Karte ist zufällig aus ${strongPool().length} Super- und Ultra-Seltenen Karten (keine OP-Karten). Hast du sie schon 3×, bekommst du Splitter.</p>`)}
 function tokenShopHTML(){const own=isOwnerMode();const f=n=>own?'∞':n;
-  return `<div class="tokrow"><div class="tokcard blue"><div class="tk-ic">🔷</div><h3>OP-Kiste</h3><p>Dreh die Kiste und gewinne Kristalle, Splitter, eine zufällige <b>OP-Karte</b> – oder mit 0,1 % sogar einen <b>🟡 Goldenen Token</b>!</p>
+  return `<div class="tokrow"><div class="tokcard blue"><div class="tk-ic">🔷</div><h3>OP-Kiste</h3><p>Dreh die Kiste und gewinne Kristalle, Splitter, eine zufällige <b>starke Karte</b> – oder mit 0,1 % sogar einen <b>🟡 Goldenen Token</b>!</p>
      <p class="tk-own">Deine Blauen Token: <b>${f(tokB())}</b></p><div class="svr"><button class="btn pri" id="tk-open">🔷 Kiste öffnen</button><button class="btn" id="tk-buyb">Token kaufen 💎 2.000</button><button class="btn sm" id="tk-odds">Chancen</button></div></div>
-   <div class="tokcard gold"><div class="tk-ic">🟡</div><h3>Goldene Ziehung</h3><p>Ziehe 1 Karte aus <b>allen ${STARTER.filter(c=>!c.token).length} Karten</b> des Spiels – jede hat die gleiche Chance, auch alle <b>♾️ Unendlichkeits-Götter</b>!</p>
+   <div class="tokcard gold"><div class="tk-ic">🟡</div><h3>Goldene Ziehung</h3><p>Ziehe 1 Karte aus <b>allen ${STARTER.filter(c=>!c.token).length} Karten</b> des Spiels – jede hat die gleiche Chance. <b>Der einzige Weg zu OP-Karten</b> (${opPool().length} Stück), auch zu allen ♾️ Unendlichkeits-Göttern!</p>
      <p class="tk-own">Deine Goldenen Token: <b>${f(tokG())}</b></p><div class="svr"><button class="btn pri" id="tk-gold">🟡 Ziehen</button><button class="btn" id="tk-buyg">Token kaufen 💎 100.000</button></div><p class="note">Goldene Token gibt es auch bei Events (kommen bald) und mit 0,1 % in der OP-Kiste.</p></div></div>`}
 document.addEventListener('click',e=>{const t=e.target;if(t.closest('#tk-open'))openCase();else if(t.closest('#tk-gold'))goldDraw();else if(t.closest('#tk-buyb'))buyToken('b');else if(t.closest('#tk-buyg'))buyToken('g');else if(t.closest('#tk-odds'))caseOdds()});
 
@@ -5487,10 +5489,10 @@ document.addEventListener('click',e=>{if(e.target.closest('#btn-intro'))showIntr
 /* ---------- 🌈 OP-Regenbogen-Token & Prestige-Shop ---------- */
 const TOKR_PRICE=250000;
 const tokR=()=>SAVE.tokR||0;
-const RB_PRIZES=[{k:'card',w:20,t:'OP-Karte',ic:'🃏',col:'#ff3b3b'},{k:'c1000',w:10,t:'1000 Kristalle',ic:'💎',col:'#ff4fd8'},{k:'c500',w:20,t:'500 Kristalle',ic:'💎',col:'#a24bff'},
+const RB_PRIZES=[{k:'card',w:20,t:'Starke Karte',ic:'🃏',col:'#ff3b3b'},{k:'c1000',w:10,t:'1000 Kristalle',ic:'💎',col:'#ff4fd8'},{k:'c500',w:20,t:'500 Kristalle',ic:'💎',col:'#a24bff'},
  {k:'u90',w:10,t:'90 Ultra-Splitter',ic:'🔶',col:'#ffd700'},{k:'u60',w:15,t:'60 Ultra-Splitter',ic:'🔶',col:'#f2a400'},{k:'u30',w:25,t:'30 Ultra-Splitter',ic:'🔶',col:'#c88400'}];
 function rbRoll(){let x=Math.random()*100;for(const p of RB_PRIZES){if((x-=p.w)<0)return p}return RB_PRIZES[RB_PRIZES.length-1]}
-function rbGrant(p){if(p.k==='card'){const pool=opPool();const c=pool[rand(pool.length)];const note=giveCardTok(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
+function rbGrant(p){if(p.k==='card'){const pool=strongPool();const c=pool[rand(pool.length)];const note=giveCardTok(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
   if(p.k[0]==='c'){addCrystals(+p.k.slice(1));return {html:`<b>💎 ${p.k.slice(1)} Kristalle</b>`}}addDust('ultra',+p.k.slice(1));return {html:`<b>${p.k.slice(1)} Ultra-Splitter</b>`}}
 async function openRainbow(){
   if(tokR()<1&&!isOwnerMode())return info('Kein 🌈 OP-Regenbogen-Token','<p>Den Token gibt es ab <b>Prestige 1</b> im ✦ Prestige-Shop für 💎 250.000.</p>');
@@ -5498,7 +5500,7 @@ async function openRainbow(){
   const tile=p=>`<div class="rt" style="--rc:${p.col}"><span>${p.ic}</span><small>${p.t}</small></div>`;
   await modal({title:'🌈 OP-Regenbogen-Kiste',body:`<div class="rbwrap">${reelHTML(items,tile)}</div><div id="case-res" class="case-res"></div>`,buttons:[{label:'Weiter',value:1,cls:'pri',disabled:true}],dismiss:null,onMount:async()=>{
     $('#modal .mbox').classList.add('wide');await spinReel(W);const g=rbGrant(res);persist();updCrys();
-    $('#case-res').innerHTML=`<div class="case-win" style="--rc:${res.col}">${res.ic} Gewonnen: ${g.html}</div>${g.card?`<div class="case-card">${cardHTML(g.card,{size:'g'})}</div>`:''}`;if(g.card)fx('🌈 OP-KARTE!','#ffd700');const b=$('#m-btns button');if(b)b.disabled=false}});
+    $('#case-res').innerHTML=`<div class="case-win" style="--rc:${res.col}">${res.ic} Gewonnen: ${g.html}</div>${g.card?`<div class="case-card">${cardHTML(g.card,{size:'g'})}</div>`:''}`;if(g.card)fx('🌈 STARKE KARTE!','#ffd700');const b=$('#m-btns button');if(b)b.disabled=false}});
   if(VIEW==='shop')renderShop();
 }
 function rbDaily(){ // nur für den Owner: 1 Token pro Tag (in beiden Modi)
@@ -5519,7 +5521,7 @@ function presShopHTML(){
   const slH=s=>`<div class="card back sz-g" style="${sleeveStyle(s.id)}">${sleeveInner(s.id)}<div class="back-in"><span>ᚱ</span></div></div>`;
   const mtH=m=>{const c=artOf(m.art);return `<div class="matprev" style="${m.css?'background:'+m.css:''}">${c?`<div class="mat-art">${artHTML(c)}</div>`:''}<span>⚔</span></div>`};
   const co=cosOwned();
-  return `<div class="tokcard rb"><div class="tk-ic">🌈</div><h3>OP-Regenbogen-Kiste</h3><p>Gewinne mit Glück eine <b>OP-Karte</b> (jede OP-Karte gleich wahrscheinlich, 1 : ${opPool().length}), 💎 1000 / 500 oder 90 / 60 / 30 Ultra-Splitter.</p>
+  return `<div class="tokcard rb"><div class="tk-ic">🌈</div><h3>OP-Regenbogen-Kiste</h3><p>Gewinne mit Glück eine <b>starke Karte</b> (1 von ${strongPool().length} Super-/Ultra-Seltenen), 💎 1000 / 500 oder 90 / 60 / 30 Ultra-Splitter.</p>
     <p class="tk-own">Deine 🌈 Token: <b>${own?'∞':tokR()}</b></p><div class="svr"><button class="btn pri" id="rb-open">🌈 Kiste öffnen</button><button class="btn" id="rb-buy">Token kaufen 💎 250.000</button><button class="btn sm" id="rb-odds">Chancen</button></div></div>
    <h3 class="shh">🖼️ Seltene Avatare</h3><div class="cosgrid">${avs.map(c=>`<div class="cosi">${avHTML({avImg:c.id},'big')}<b>${esc(c.name.split(',')[0])}</b>${has(c.id)||own?'<span class="tag">✓ Freigeschaltet</span>':`<button class="btn sm" data-pav="${c.id}">💎 25.000</button>`}</div>`).join('')}</div>
    <h3 class="shh">🂠 Prestige-Kartenhüllen</h3><div class="cosgrid">${PRES_SL.map(s=>{const o=hasCos('sl',s.id),on=mySleeve()===s.id;return `<div class="cosi ${on?'on':''}">${slH(s)}<b>${s.n}</b>${on?'<span class="tag">✓ Aktiv</span>':o?`<button class="btn sm pri" data-csl="${s.id}">Ausrüsten</button>`:`<button class="btn sm" data-cbuy="sl:${s.id}">💎 ${s.p.toLocaleString('de-DE')}</button>`}</div>`}).join('')}</div>
@@ -5527,7 +5529,7 @@ function presShopHTML(){
 }
 document.addEventListener('click',async e=>{const t=e.target;
   if(t.closest('#rb-open'))return openRainbow();
-  if(t.closest('#rb-odds'))return info('🌈 Chancen',`<table class="otab"><tr><th>Gewinn</th><th>Chance</th></tr>${RB_PRIZES.map(p=>`<tr><td style="color:${p.col}">${p.ic} ${p.t}</td><td>${p.w} %</td></tr>`).join('')}</table><p class="note">Die OP-Karte wird zufällig aus allen ${opPool().length} OP-Karten gezogen.</p>`);
+  if(t.closest('#rb-odds'))return info('🌈 Chancen',`<table class="otab"><tr><th>Gewinn</th><th>Chance</th></tr>${RB_PRIZES.map(p=>`<tr><td style="color:${p.col}">${p.ic} ${p.t}</td><td>${p.w} %</td></tr>`).join('')}</table><p class="note">Die starke Karte wird aus ${strongPool().length} Super-/Ultra-Seltenen Karten gezogen (keine OP-Karten).</p>`);
   if(t.closest('#rb-buy')){if(!presOK())return;if(SAVE.crystals<TOKR_PRICE)return info('Zu wenig Kristalle','<p>Ein 🌈 OP-Regenbogen-Token kostet 💎 250.000.</p>');
     const ok=await modal({title:'Token kaufen',body:'<p>🌈 OP-Regenbogen-Token für <b>💎 250.000</b> kaufen?</p>',buttons:[{label:'Abbrechen',value:0},{label:'Kaufen',value:1,cls:'pri'}],dismiss:0});if(!ok)return;SAVE.crystals-=TOKR_PRICE;SAVE.tokR=tokR()+1;persist();updCrys();renderShop();return}
   const pa=t.closest('[data-pav]');if(pa){if(SAVE.crystals<25000)return info('Zu wenig Kristalle','<p>Ein seltener Avatar kostet 💎 25.000.</p>');const c=getCard(pa.dataset.pav);
