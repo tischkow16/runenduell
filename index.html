@@ -525,6 +525,9 @@ details.onl-card summary{cursor:pointer}
 .tokcard.rb{background:linear-gradient(135deg,#3b0b4a,#0b2a4a,#0b4a2a);border-color:#ff6bd8;margin-bottom:14px;animation:rbGlow 4s linear infinite}
 .pres-lock{text-align:center;padding:30px;border:2px dashed #f2c14e66;border-radius:14px;position:relative}.pres-lock h3{font:800 24px Cinzel,serif}
 .rbwrap .reel-wrap{border-color:#ff6bd8;box-shadow:0 0 18px #ff6bd866}
+.hcard.upd-new{border-color:#c6ff3d!important;box-shadow:0 0 14px #c6ff3d77;animation:mzPulse 2.4s ease-in-out infinite}.upd-tag{background:#c6ff3d;color:#111;border-radius:6px;padding:0 6px;font-size:11px}
+.updbox{text-align:center}.updnew{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;margin:10px 0;padding:16px;border:0;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,#d7ff3d,#3bd8ff);color:#111;font:800 22px system-ui;box-shadow:0 0 20px #c6ff3d88}
+.updnew small{font:600 13px system-ui;opacity:.8}.updn{text-align:left;margin:8px auto;max-width:460px}.upd-ok{font-size:18px;color:#c6ff3d}
 #apptoast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,150%);z-index:9999;background:#1c1338f2;border:1px solid #c6ff3d88;box-shadow:0 8px 30px #000a;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:92vw;transition:transform .35s;color:#fff}
 #apptoast.on{transform:translate(-50%,0)}
 </style>
@@ -553,6 +556,7 @@ details.onl-card summary{cursor:pointer}
       <button class="hcard" data-nav="shop"><span>💎</span><div><b>Shop</b><small>Neue Kartenpakete</small></div></button>
       <button class="hcard" data-nav="sammlung"><span>📚</span><div><b>Werkstatt</b><small id="menu-coll"></small></div></button>
       <button class="hcard hidden" id="btn-install"><span>📲</span><div><b>Als App installieren</b><small>Auf Handy oder PC – spielt sich wie eine App</small></div></button>
+      <button class="hcard" id="btn-update"><span>🔄</span><div><b>Updates</b><small>Version …</small></div></button>
       <button class="hcard" id="btn-intro"><span>📘</span><div><b>Spielanleitung</b><small>Wie funktioniert Runenduell?</small></div></button>
       <button class="hcard" id="btn-save"><span>💾</span><div><b>Spielstand übertragen</b><small>Sichern oder auf ein anderes Gerät laden</small></div></button>
       <button class="hcard" id="btn-settings"><span>⚙️</span><div><b>Einstellungen</b><small>Spielstand zurücksetzen</small></div></button>
@@ -2144,7 +2148,7 @@ function modal({title,body='',buttons=[{label:'OK',value:true,cls:'pri'}],onMoun
     modalResolve=v=>{$('#modal').classList.remove('on');modalResolve=null;res(v)};
     $('#modal .mbox').classList.remove('wide');$('#m-title').textContent=title;$('#m-body').innerHTML=body;
     $('#m-btns').innerHTML=buttons.map((b,i)=>`<button class="btn ${b.cls||''}" data-mi="${i}" ${b.disabled?'disabled':''}>${b.label}</button>`).join('');
-    $('#m-btns').querySelectorAll('button').forEach(el=>el.onclick=()=>modalResolve(buttons[+el.dataset.mi].value));
+    $('#m-btns').querySelectorAll('button').forEach(el=>el.onclick=()=>modalResolve&&modalResolve(buttons[+el.dataset.mi].value));
     $('#modal').onclick=e=>{if(e.target.id==='modal'&&dismiss!==undefined&&modalResolve)modalResolve(dismiss)};
     $('#modal').classList.add('on');
     if(onMount)onMount();
@@ -4844,6 +4848,8 @@ function guestSnap(s){
 }
 function netMsg(m){
   if(m.t==='hi'&&NET.role==='guest'){if(!NET.started)netSend({t:'hello',name:prof().name||'Gast',deck:{main:curDeck().main,extra:curDeck().extra}});return}
+  if(m.t==='hello'&&NET.role==='host'&&verMismatch(m.v)){netSend({t:'oldver',v:APP_VER});const mm=verMismatch(m.v);onlineStatus(mm==='freund'?'❌ Dein Freund hat eine ältere Version – er muss zuerst updaten.':'❌ Du hast eine ältere Version – bitte zuerst updaten.');if(mm==='du')onlineAllowed();return}
+  if(m.t==='oldver'&&NET.role==='guest'){const mm=verMismatch(m.v);onlineStatus(mm==='du'?'❌ Du hast eine ältere Version – bitte zuerst updaten.':'❌ Dein Freund hat eine ältere Version – er muss zuerst updaten.');if(mm==='du')onlineAllowed();return}
   if(m.t==='hello'&&NET.role==='host'){if(NET.started)return;NET.started=true;NET.oppName=(m.name||'Freund').slice(0,20);hostStart(m.deck);return}
   if(m.t==='ans'){const r=NET.pend[m.id];if(r){delete NET.pend[m.id];r(m.v)}return}
   if(m.t==='cmd'&&NET.role==='host'){hostCmd(m.name,m.args||[]);return}
@@ -4864,7 +4870,7 @@ function netClosed(){
 function bindChannel(ch){
   NET.ch=ch;NET.on=true;
   ch.onmsg=d=>{let m;try{m=JSON.parse(d)}catch(e){return}netMsg(m)};
-  if(NET.role==='guest'){onlineStatus('Verbunden! Warte auf den Start …');netSend({t:'hello',name:prof().name||'Gast',deck:{main:curDeck().main,extra:curDeck().extra}})}
+  if(NET.role==='guest'){onlineStatus('Verbunden! Warte auf den Start …');netSend({t:'hello',v:APP_VER,name:prof().name||'Gast',deck:{main:curDeck().main,extra:curDeck().extra}})}
   else{onlineStatus('Freund verbunden! Duell startet …');netSend({t:'hi'})}
 }
 function hostStart(deck){
@@ -4930,6 +4936,7 @@ const copyTxt=async id=>{const t=$('#'+id).value;try{await navigator.clipboard.w
 $('#online').addEventListener('click',async e=>{
   const id=e.target.id;const nm=$('#on-name');if(nm&&nm.value.trim()){prof().name=nm.value.trim().slice(0,20);persist()}
   try{
+    if(['on-host','on-join','mh-make','mg-make','mh-accept'].includes(id)&&!(await onlineAllowed()))return;
     if(id==='on-host'){onlineStatus('Raum wird erstellt …');const code=await roomHost();$('#on-code').innerHTML=`Dein Raumcode:<b>${code}</b><small>Schick ihn deinem Freund. Warte auf Verbindung …</small>`;onlineStatus('Warte auf deinen Freund …')}
     if(id==='on-join'){const code=$('#on-join-code').value.trim();if(!code)return;onlineStatus('Verbinde …');await roomJoin(code)}
     if(id==='mh-make'){onlineStatus('Einladungscode wird erstellt …');$('#mh-offer').value=await manualHost();onlineStatus('Schick den Einladungscode an Spieler B.')}
@@ -4941,8 +4948,8 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.0.7';
-const CHANGELOG={'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+const APP_VER='1.0.8';
+const CHANGELOG={'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
 setTimeout(()=>{try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const st=SAVE.stats||{},old=!!v||(st.wins||0)+(st.losses||0)+(st.packs||0)>0;const gift=old&&CHANGELOG[APP_VER];if(gift)addCrystals(100);persist();updCrys();
   if(old)info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
   const m=$('#v-menu');if(m&&!$('#appver')){m.insertAdjacentHTML('beforeend',`<p id="appver" class="note" style="text-align:center;opacity:.6;margin:18px 0 8px">Runenduell · Version ${APP_VER}</p>`)}},800);
@@ -4954,7 +4961,7 @@ function appToast(html,btns=[]){let t=$('#apptoast');if(!t){t=document.createEle
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.ai|claudeusercontent/.test(location.host)){
   window.addEventListener('load',async()=>{try{
     const reg=await navigator.serviceWorker.register('sw.js');
-    const ask=w=>appToast('✨ <b>Neues Update verfügbar!</b> Neue Karten oder Verbesserungen sind da.',[{l:'Jetzt aktualisieren',f:()=>w.postMessage('skip')},{l:'Später'}]);
+    const ask=w=>{checkUpdate(true);appToast('✨ <b>Neues Update verfügbar!</b> Tippe auf der Startseite auf „🔄 Updates“.',[{l:'Jetzt ansehen',f:()=>{go('menu');openUpdates()}},{l:'Später'}])};
     if(reg.waiting&&navigator.serviceWorker.controller)ask(reg.waiting);
     reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)ask(w)})});
     const hadCtrl=!!navigator.serviceWorker.controller;let rl=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(rl||!hadCtrl)return;rl=true;if(!(G&&!G.over&&VIEW==='duell'))location.reload();else appToast('Update installiert – es wird nach dem Duell aktiv.',[{l:'Jetzt neu laden',f:()=>location.reload()}])});
@@ -4997,10 +5004,10 @@ const friends=()=>(SAVE.friends=SAVE.friends||[]);
 const fCode=id=>String(id||'').replace(FPRE,'');
 function myStatus(){return NET.on?'duel':'online'}
 function presSend(code,o){const c=PRES.conns[code];try{c&&c.open&&c.send(JSON.stringify(o))}catch(e){}}
-function presBroadcast(){hubUpdateMe();for(const k in PRES.conns)presSend(k,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null})}
+function presBroadcast(){hubUpdateMe();for(const k in PRES.conns)presSend(k,{t:'p-hello',v:APP_VER,name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null})}
 function presAttach(c){
   const code=fCode(c.peer);
-  c.on('open',()=>{const old=PRES.conns[code];if(old&&old!==c&&old.open){try{c.close()}catch(e){}return}PRES.conns[code]=c;presSend(code,{t:'p-hello',name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null});renderFriendsSoft()});
+  c.on('open',()=>{const old=PRES.conns[code];if(old&&old!==c&&old.open){try{c.close()}catch(e){}return}PRES.conns[code]=c;presSend(code,{t:'p-hello',v:APP_VER,name:prof().name||'Duellant',code:myCode(),st:myStatus(),rank:rankOf(),av:prof().av,avImg:prof().avImg||null});renderFriendsSoft()});
   c.on('data',d=>{let m;try{m=JSON.parse(d)}catch(e){return}
     if(m.t&&(m.t.startsWith('p-')||m.t.startsWith('inv')))return presMsg(code,m);
     if(NET.on&&NET.viaCode===code&&NET.ch&&NET.ch.onmsg)NET.ch.onmsg(d)});
@@ -5008,7 +5015,7 @@ function presAttach(c){
   c.on('close',gone);c.on('error',gone);
 }
 function presMsg(code,m){
-  if(m.t==='p-hello'){PRES.status[code]=m.st||'online';PRES.names[code]=m.name;PRES.info=PRES.info||{};PRES.info[code]={rank:m.rank,av:m.av,avImg:m.avImg};
+  if(m.t==='p-hello'){PRES.status[code]=m.st||'online';PRES.names[code]=m.name;PRES.info=PRES.info||{};PRES.info[code]={rank:m.rank,av:m.av,avImg:m.avImg,v:m.v};
     const f=friends().find(x=>x.code===code);if(f){if(m.name&&f.name!==m.name){f.name=m.name;persist()}}
     else{friends().push({code,name:m.name||code});persist();appToast(`👋 <b>${esc(m.name||code)}</b> hat dich als Freund hinzugefügt!`,[{l:'OK'}])}
     renderFriendsSoft();return}
@@ -5016,6 +5023,7 @@ function presMsg(code,m){
   if(m.t==='inv')return gotInvite(code,m);
   if(m.t==='inv-no'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('no');return}
   if(m.t==='inv-busy'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('busy');return}
+  if(m.t==='inv-old'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('old');return}
   if(m.t==='inv-yes'&&PRES.inv&&PRES.inv.code===code){PRES.inv.res('yes');return}
   if(m.t==='inv-cancel'&&PRES.incoming===code){PRES.incoming=null;if(modalResolve)modalResolve('cancel');appToast('Die Einladung wurde zurückgezogen.',[{l:'OK'}])}
 }
@@ -5040,9 +5048,11 @@ function presPoll(){
 }
 async function inviteFriend(code){
   const f=friends().find(x=>x.code===code);if(!f)return;
+  if(!(await onlineAllowed()))return;
+  const fv=(PRES.info||{})[code]&&PRES.info[code].v;const mm=verMismatch(fv);if(mm==='du')return onlineAllowed();if(mm==='freund')return info('Freund muss updaten',`<p>${esc(f.name)} hat eine ältere Version (${fv||'unbekannt'}). Online-Duelle gehen nur, wenn beide die neueste Version (${APP_VER}) haben.</p>`);
   if(!(PRES.conns[code]&&PRES.conns[code].open))return info('Nicht online',`<p>${esc(f.name)} ist gerade nicht online.</p>`);
   if(PRES.status[code]==='duel')return info('Im Duell',`<p>${esc(f.name)} ist gerade in einem Duell. Versuch es gleich nochmal.</p>`);
-  presSend(code,{t:'inv',name:prof().name||'Duellant',deck:(curDeck()||{}).name||''});
+  presSend(code,{t:'inv',name:prof().name||'Duellant',deck:(curDeck()||{}).name||'',v:APP_VER});
   const ans=await new Promise(res=>{PRES.inv={code,res};
     const to=setTimeout(()=>res('timeout'),30000);
     modal({title:'⚔️ Einladung gesendet',body:`<p>Warte auf <b>${esc(f.name)}</b> …</p><p class="note">Die Einladung läuft nach 30 Sekunden ab.</p>`,buttons:[{label:'Abbrechen',value:'cancel'}],dismiss:'cancel'}).then(v=>{if(v==='cancel')res('cancel')});
@@ -5050,6 +5060,7 @@ async function inviteFriend(code){
   PRES.inv.done&&PRES.inv.done();PRES.inv=null;if(modalResolve)modalResolve(null);
   if(ans==='cancel'){presSend(code,{t:'inv-cancel'});return}
   if(ans==='no')return info('Abgelehnt',`<p>${esc(f.name)} hat die Einladung abgelehnt.</p>`);
+  if(ans==='old')return info('Versionen passen nicht',`<p>${esc(f.name)} und du habt unterschiedliche Versionen. Beide müssen auf der neuesten Version sein (Startseite → 🔄 Updates).</p>`);
   if(ans==='busy')return info('Gerade beschäftigt',`<p>${esc(f.name)} ist gerade beschäftigt. Versuch es gleich nochmal.</p>`);
   if(ans==='timeout'){presSend(code,{t:'inv-cancel'});return info('Keine Antwort',`<p>${esc(f.name)} hat nicht geantwortet.</p>`)}
   startFriendDuel(code,'host');
@@ -5057,6 +5068,8 @@ async function inviteFriend(code){
 async function gotInvite(code,m){
   const busy=NET.on||(G&&!G.over&&VIEW==='duell')||PRES.incoming;
   if(busy){presSend(code,{t:'inv-busy'});return}
+  {const mm=verMismatch(m.v);if(mm){presSend(code,{t:'inv-old',v:APP_VER});if(mm==='du')onlineAllowed();else appToast(`${esc(m.name||code)} wollte dich herausfordern, hat aber eine ältere Version.`,[{l:'OK'}]);return}}
+  if(!(await onlineAllowed())){presSend(code,{t:'inv-old',v:APP_VER});return}
   PRES.incoming=code;
   const v=await modal({title:'⚔️ Duell-Einladung!',body:`<div class="inv-pop"><span class="inv-av">🌐</span><p><b>${esc(m.name||code)}</b> fordert dich zu einem Duell heraus!</p><p class="note">Du spielst mit deinem aktiven Deck <b>${esc((curDeck()||{}).name||'')}</b>.</p></div>`,
     buttons:[{label:'❌ Ablehnen',value:'no'},{label:'⚔️ Annehmen',value:'yes',cls:'pri'}],dismiss:'no'});
@@ -5084,7 +5097,7 @@ function addFriend(code){
 }
 function friendsHTML(){
   const st=c=>{const s=PRES.status[c];return s==='duel'?['⚔️','Im Duell','duel']:(PRES.conns[c]&&PRES.conns[c].open)?['🟢','Online','on']:['⚪','Offline','off']};
-  const list=friends().map(f=>{const [ic,tx,cl]=st(f.code);return `<div class="frow ${cl}"><span class="fdot">${ic}</span>${avHTML((PRES.info||{})[f.code]||{av:'🧙'},'sm')}<div class="fnm"><b>${esc(PRES.names[f.code]||f.name)}${((PRES.info||{})[f.code]||{}).rank==='owner'?' <span class="rank r-owner sm">👑 Owner</span>':''}</b><small>${tx} · ${f.code}</small></div>
+  const list=friends().map(f=>{const [ic,tx,cl]=st(f.code);return `<div class="frow ${cl}"><span class="fdot">${ic}</span>${avHTML((PRES.info||{})[f.code]||{av:'🧙'},'sm')}<div class="fnm"><b>${esc(PRES.names[f.code]||f.name)}${((PRES.info||{})[f.code]||{}).rank==='owner'?' <span class="rank r-owner sm">👑 Owner</span>':''}</b><small>${tx} · ${f.code}${(PRES.info||{})[f.code]&&PRES.info[f.code].v&&PRES.info[f.code].v!==APP_VER?` · ⚠️ v${PRES.info[f.code].v}`:''}</small></div>
     <button class="btn pri sm" data-finv="${f.code}" ${cl==='on'?'':'disabled'}>⚔️ Einladen</button><button class="btn sm" data-fdel="${f.code}">✕</button></div>`}).join('');
   return `<div class="panel onl-card" id="friends-box"><h3>👥 Freunde</h3>
    <div class="fme">Dein Freundescode: <b>${myCode()}</b> <button class="btn sm" id="f-copy">📋 Kopieren</button>
@@ -5227,10 +5240,10 @@ const CASE_PRIZES=[
 ];
 function rollPrize(){let x=Math.random()*100;for(const p of CASE_PRIZES){if((x-=p.w)<0)return p}return CASE_PRIZES[CASE_PRIZES.length-1]}
 const opPool=()=>STARTER.filter(c=>!c.token&&opCached(c));
-function giveCard(c){const before=own(c.id);if(before>=3){addDust(rarity(c),DUST_GET);return `bereits 3× im Besitz → +${DUST_GET} Splitter`}SAVE.owned[c.id]=before+1;return before?'':'NEU!'}
+function giveCardTok(c){const before=own(c.id);if(before>=3){addDust(rarity(c),DUST_GET);return `bereits 3× im Besitz → +${DUST_GET} Splitter`}SAVE.owned[c.id]=before+1;return before?'':'NEU!'}
 function grantPrize(p){
   if(p.k==='gold'){SAVE.tokG=tokG()+1;return {html:'<b>🟡 1 Goldener Token!</b>'}}
-  if(p.k==='card'){const pool=opPool();const c=pool[rand(pool.length)];const note=giveCard(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
+  if(p.k==='card'){const pool=opPool();const c=pool[rand(pool.length)];const note=giveCardTok(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
   if(p.k.startsWith('c')){const n=+p.k.slice(1);addCrystals(n);return {html:`<b>💎 ${n} Kristalle</b>`}}
   if(p.k==='u30'){addDust('ultra',30);return {html:'<b>30 Ultra-Splitter</b>'}}
   if(p.k==='n10'){addDust('normal',10);return {html:'<b>10 Normal-Splitter</b>'}}
@@ -5258,7 +5271,7 @@ async function goldDraw(){
   if(!isOwnerMode())SAVE.tokG=tokG()-1;
   const pool=STARTER.filter(c=>!c.token);const win=pool[rand(pool.length)];const W=52;
   const infs=pool.filter(c=>c.inf);const items=Array.from({length:60},(_,k)=>k===W?win:(k%7===3&&infs.length?infs[rand(infs.length)]:pool[rand(pool.length)]));
-  const note=giveCard(win);persist();updCrys();
+  const note=giveCardTok(win);persist();updCrys();
   const tile=c=>`<div class="rt card-t" style="--rc:${RAR[rarity(c)][1]}">${artHTML(c)}<small>${esc(c.name)}</small></div>`;
   await modal({title:'🟡 Goldene Ziehung',body:`<p class="note" style="text-align:center">Jede der ${pool.length} Karten hat die gleiche Chance: <b>1 : ${pool.length}</b> – auch jeder ♾️-Gott!</p>${reelHTML(items,tile)}<div id="case-res" class="case-res"></div>`,
     buttons:[{label:'Weiter',value:1,cls:'pri',disabled:true}],dismiss:null,onMount:async()=>{$('#modal .mbox').classList.add('wide');await spinReel(W);
@@ -5361,7 +5374,7 @@ const tokR=()=>SAVE.tokR||0;
 const RB_PRIZES=[{k:'card',w:20,t:'OP-Karte',ic:'🃏',col:'#ff3b3b'},{k:'c1000',w:10,t:'1000 Kristalle',ic:'💎',col:'#ff4fd8'},{k:'c500',w:20,t:'500 Kristalle',ic:'💎',col:'#a24bff'},
  {k:'u90',w:10,t:'90 Ultra-Splitter',ic:'🔶',col:'#ffd700'},{k:'u60',w:15,t:'60 Ultra-Splitter',ic:'🔶',col:'#f2a400'},{k:'u30',w:25,t:'30 Ultra-Splitter',ic:'🔶',col:'#c88400'}];
 function rbRoll(){let x=Math.random()*100;for(const p of RB_PRIZES){if((x-=p.w)<0)return p}return RB_PRIZES[RB_PRIZES.length-1]}
-function rbGrant(p){if(p.k==='card'){const pool=opPool();const c=pool[rand(pool.length)];const note=giveCard(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
+function rbGrant(p){if(p.k==='card'){const pool=opPool();const c=pool[rand(pool.length)];const note=giveCardTok(c);return {html:`<b>🃏 ${esc(c.name)}</b>${note?` <small>(${note})</small>`:''}`,card:c}}
   if(p.k[0]==='c'){addCrystals(+p.k.slice(1));return {html:`<b>💎 ${p.k.slice(1)} Kristalle</b>`}}addDust('ultra',+p.k.slice(1));return {html:`<b>${p.k.slice(1)} Ultra-Splitter</b>`}}
 async function openRainbow(){
   if(tokR()<1&&!isOwnerMode())return info('Kein 🌈 OP-Regenbogen-Token','<p>Den Token gibt es ab <b>Prestige 1</b> im ✦ Prestige-Shop für 💎 250.000.</p>');
@@ -5405,6 +5418,55 @@ document.addEventListener('click',async e=>{const t=e.target;
     const ok=await modal({title:'Avatar kaufen',body:`<div style="display:flex;justify-content:center">${avHTML({avImg:c.id},'big')}</div><p style="text-align:center">${esc(c.name)} für 💎 25.000?</p>`,buttons:[{label:'Abbrechen',value:0},{label:'Kaufen',value:1,cls:'pri'}],dismiss:0});if(!ok)return;
     SAVE.crystals-=25000;SAVE.avUnlock=SAVE.avUnlock||[];SAVE.avUnlock.push(c.id);persist();updCrys();appToast('🖼️ Neuer Avatar freigeschaltet! Wähle ihn im Profil.',[{l:'OK'}]);renderShop()}
 });
+
+/* ---------- Updates (manuell) & Versions-Pflicht fürs Online-Spiel ---------- */
+const SITE_URL='https://tischkow16.github.io/runenduell/';
+const VER_URL='https://raw.githubusercontent.com/tischkow16/runenduell/main/version.json';
+const UPD={latest:null,notes:[],checked:0,err:false};
+const vcmp=(a,b)=>{const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let k=0;k<3;k++){if((x[k]||0)!==(y[k]||0))return (x[k]||0)-(y[k]||0)}return 0};
+async function checkUpdate(force){
+  if(!force&&Date.now()-UPD.checked<60000&&UPD.latest)return UPD.latest;
+  try{const r=await fetch(VER_URL+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const j=await r.json();UPD.latest=j.v;UPD.notes=j.notes||[];UPD.err=false}catch(e){UPD.err=true}
+  UPD.checked=Date.now();renderUpdBadge();return UPD.latest;
+}
+const updAvailable=()=>UPD.latest&&vcmp(UPD.latest,APP_VER)>0;
+function renderUpdBadge(){const b=$('#btn-update');if(!b)return;const s=b.querySelector('small');b.classList.toggle('upd-new',!!updAvailable());
+  if(s)s.innerHTML=updAvailable()?`<b class="upd-tag">NEU</b> Version ${UPD.latest} ist da!`:`Version ${APP_VER} · ${UPD.err?'nicht geprüft':'aktuell'}`}
+async function installUpdate(){
+  if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.host)){
+    return info('Neue Version laden',`<p>Diese Version läuft nicht über die Runenduell-Webseite. Öffne das Spiel hier, um immer die neueste Version zu haben:</p><p><a href="${SITE_URL}" target="_blank" rel="noopener"><b>${SITE_URL}</b></a></p><p class="note">Dein Spielstand: über „💾 Spielstand übertragen“ mitnehmen.</p>`)}
+  if(G&&!G.over&&VIEW==='duell')return info('Gerade im Duell','<p>Beende zuerst dein Duell, dann kannst du das Update laden.</p>');
+  persist();fx('🔄 Update wird geladen …','#c6ff3d');
+  try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister()))}catch(e){}
+  setTimeout(()=>location.replace(location.pathname+'?v='+Date.now()),400);
+}
+async function showUpdates(){
+  await info('🔄 Updates','<p class="note">Suche nach neuen Versionen …</p>');
+}
+async function openUpdates(){
+  const p=checkUpdate(true);
+  let done=false;
+  const draw=()=>{const av=updAvailable();
+    return `<div class="updbox"><p>Deine Version: <b>${APP_VER}</b></p>
+     ${!UPD.latest?(UPD.err&&UPD.checked?'<p class="note">⚠️ Konnte nicht nach Updates suchen (keine Internetverbindung?).</p>':'<p class="note">⏳ Suche nach neuen Versionen …</p>'):
+       av?`<button class="updnew" id="upd-go"><span>✨ Neue Version ${UPD.latest}</span><small>Antippen zum Laden</small></button>${UPD.notes.length?`<ul class="updn">${UPD.notes.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}`
+       :`<p class="upd-ok">✅ Du hast die neueste Version!</p>`}
+     <p class="note">Dein Spielstand bleibt beim Update erhalten. Online-Duelle gegen Freunde gehen nur mit der neuesten Version.</p></div>`};
+  await modal({title:'🔄 Updates',body:`<div id="upd-body">${draw()}</div>`,buttons:[{label:'Schließen',value:0}],dismiss:0,onMount:()=>{
+    p.then(()=>{const b=$('#upd-body');if(b)b.innerHTML=draw()});
+    $('#upd-body').onclick=e=>{if(e.target.closest('#upd-go'))installUpdate()}}});
+}
+/* Versions-Pflicht */
+async function onlineAllowed(){
+  await checkUpdate(false);
+  if(updAvailable()){
+    const r=await modal({title:'🔒 Update erforderlich',body:`<p>Für Online-Duelle gegen Freunde brauchst du die <b>neueste Version (${UPD.latest})</b>.</p><p>Deine Version: <b>${APP_VER}</b></p>`,buttons:[{label:'Später',value:0},{label:'✨ Jetzt updaten',value:1,cls:'pri'}],dismiss:0});
+    if(r)installUpdate();return false}
+  return true;
+}
+function verMismatch(v){if(!v)v='0.0.0';if(vcmp(v,APP_VER)===0)return false;return vcmp(v,APP_VER)>0?'du':'freund'}
+document.addEventListener('click',e=>{if(e.target.closest('#btn-update'))openUpdates()},true);
+setTimeout(()=>checkUpdate(true),2500);setInterval(()=>checkUpdate(true),15*60*1000);
 
 async function resetGame(){
   const r=await modal({title:'⚙️ Einstellungen',body:`<p>Hier kannst du dein ganzes Spiel <b>von vorne beginnen</b>.</p><p class="note">Dabei wird alles gelöscht: Karten, Decks, Kristalle, Splitter, Truhen, Geschichte, Battle Pass und Statistiken. Du startest wieder mit dem Starterdeck.</p>`,
