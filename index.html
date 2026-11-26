@@ -530,6 +530,66 @@ details.onl-card summary{cursor:pointer}
 .updnew small{font:600 13px system-ui;opacity:.8}.updn{text-align:left;margin:8px auto;max-width:460px}.upd-ok{font-size:18px;color:#c6ff3d}
 .inst-bar{display:flex;align-items:center;gap:12px;margin:10px 0;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,#2a1a55,#152a55);border:1px solid #7c5cff;box-shadow:0 0 16px #7c5cff55}.inst-bar.hidden{display:none}.inst-bar .ib-ic{font-size:30px}.inst-bar div{flex:1}.inst-bar small{display:block;color:#c9c3ee}
 .hlive{display:grid;gap:10px;margin:10px 0}.hl-box{padding:10px 14px;border-radius:14px;background:#141a2e;border:1px solid #2d3555}.hl-box.own{border-color:#f5c542;background:#231c0e}.hl-box h4{margin:0 0 6px;font:700 14px system-ui}.hl-chips{display:flex;flex-wrap:wrap;gap:6px}.hl-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#0008;border:1px solid #ffffff22;font:600 13px system-ui}.hl-chip button{padding:2px 8px}.hl-chip small{opacity:.7}
+/* ---- Lebendige Karten ---- */
+.slot.mz.alive .c-art .spr,.slot.mz.alive .c-art>svg,.slot.mz.alive .c-art>img{animation:breathe 4.2s ease-in-out infinite;animation-delay:var(--ad,0s);transform-origin:50% 60%}
+@keyframes breathe{0%,100%{transform:scale(1.02) translate(0,0)}25%{transform:scale(1.06) translate(-1.2%,-1.5%)}50%{transform:scale(1.09) translate(0,-2.5%)}75%{transform:scale(1.06) translate(1.2%,-1.2%)}}
+.slot.mz.alive .c-art::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;opacity:.85;
+  background-image:radial-gradient(circle,var(--ac) 0 1px,transparent 2px),radial-gradient(circle,#fff 0 .8px,transparent 1.6px),radial-gradient(circle,var(--ac) 0 1.3px,transparent 2.4px);
+  background-size:23px 31px,37px 29px,47px 53px;animation:motes 3.2s linear infinite;animation-delay:var(--ad,0s)}
+@keyframes motes{from{background-position:0 0,10px 0,5px 0}to{background-position:4px -31px,0 -58px,12px -53px}}
+.slot.mz.alive .c-art::before{content:'';position:absolute;inset:-30%;z-index:1;pointer-events:none;background:linear-gradient(115deg,transparent 40%,#ffffff55 50%,transparent 60%);animation:glint 5.5s ease-in-out infinite;animation-delay:var(--ad,0s)}
+@keyframes glint{0%,70%{transform:translateX(-80%)}100%{transform:translateX(80%)}}
+.slot.mz.alive{animation:aura 2.8s ease-in-out infinite;animation-delay:var(--ad,0s)}
+@keyframes aura{0%,100%{filter:drop-shadow(0 0 2px var(--ac))}50%{filter:drop-shadow(0 0 9px var(--ac))}}
+.slot.mz.alive.boss{animation-duration:1.6s}
+.slot.mz.alive.def .c-art .spr{animation-duration:7s}
+/* ---- Angriffs-Animation ---- */
+.atk-lunge{position:relative;z-index:60!important;filter:drop-shadow(0 0 14px var(--ac)) brightness(1.15)}
+.atkhit{position:fixed;width:180px;height:180px;margin:-90px 0 0 -90px;pointer-events:none;z-index:9000;border-radius:50%}
+.atkhit::before,.atkhit::after{content:'';position:absolute;inset:0;border-radius:50%}
+.atkhit.hf::before{background:radial-gradient(circle,#fff 0,#ffd166 18%,#ff6b1a 40%,#e4572e66 60%,transparent 70%);animation:boom .55s ease-out forwards}
+.atkhit.hf::after{background:conic-gradient(from 0deg,transparent,#ff9f1a,transparent 20%,#ffd166,transparent 40%,#ff6b1a,transparent 60%,#ffb347,transparent 80%);animation:boomspin .6s ease-out forwards}
+.atkhit.hw::before{border:6px solid #8fd3ff;box-shadow:0 0 20px #2e86de,inset 0 0 20px #2e86de;animation:ring .6s ease-out forwards}
+.atkhit.hw::after{background:radial-gradient(circle,#ffffffcc 0,#5ab0ff88 30%,transparent 60%);animation:boom .5s ease-out forwards}
+.atkhit.hn::before{background:linear-gradient(135deg,transparent 45%,#c6ffd8 48%,#3bb273 50%,transparent 53%),linear-gradient(45deg,transparent 45%,#c6ffd8 48%,#3bb273 50%,transparent 53%);border-radius:0;animation:slash .45s ease-out forwards}
+.atkhit.hn::after{border:3px dashed #7dffb0;animation:ring .55s ease-out forwards}
+.atkhit.he::before{background:radial-gradient(circle,#f3d6a4 0,#a0703c 35%,#5a3a16aa 55%,transparent 68%);animation:boom .6s ease-out forwards}
+.atkhit.he::after{background:radial-gradient(circle at 20% 30%,#7a5228 0 6px,transparent 7px),radial-gradient(circle at 75% 25%,#7a5228 0 8px,transparent 9px),radial-gradient(circle at 60% 80%,#7a5228 0 5px,transparent 6px),radial-gradient(circle at 25% 75%,#7a5228 0 7px,transparent 8px);animation:rocks .6s ease-out forwards}
+.atkhit.hl::before{background:repeating-conic-gradient(from 0deg,#fff6c2 0 6deg,transparent 6deg 24deg);animation:boomspin .6s ease-out forwards}
+.atkhit.hl::after{background:radial-gradient(circle,#fff 0,#f7d154 30%,transparent 62%);animation:boom .5s ease-out forwards}
+.atkhit.hd::before{background:radial-gradient(circle,#000 0,#2a0f4a 30%,#6c3fa0 50%,transparent 66%);animation:implode .6s ease-in forwards}
+.atkhit.hd::after{border:4px solid #b17dff;box-shadow:0 0 24px #6c3fa0;animation:ringin .6s ease-in forwards}
+.atkhit.hg::before{background:conic-gradient(#ff3b3b,#ffb03b,#fff53b,#3bff6b,#3bd8ff,#7a3bff,#ff3bd8,#ff3b3b);animation:boomspin .7s ease-out forwards;filter:blur(2px)}
+.atkhit.hg::after{background:radial-gradient(circle,#fff 0,#ffffffaa 30%,transparent 60%);animation:boom .6s ease-out forwards}
+@keyframes boom{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes boomspin{0%{transform:scale(.3) rotate(0);opacity:1}100%{transform:scale(1.6) rotate(120deg);opacity:0}}
+@keyframes ring{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.7);opacity:0}}
+@keyframes ringin{0%{transform:scale(1.8);opacity:0}60%{opacity:1}100%{transform:scale(.1);opacity:0}}
+@keyframes implode{0%{transform:scale(1.6);opacity:0}50%{opacity:1}100%{transform:scale(.2);opacity:0}}
+@keyframes slash{0%{transform:scale(.4) rotate(-20deg);opacity:1}100%{transform:scale(1.4) rotate(10deg);opacity:0}}
+@keyframes rocks{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.8) rotate(40deg);opacity:0}}
+.atkspark{position:fixed;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;pointer-events:none;z-index:8999;background:var(--ac);box-shadow:0 0 10px var(--ac);animation:spark .45s ease-out forwards}
+@keyframes spark{to{transform:scale(.1);opacity:0}}
+.quake{animation:quake .4s linear}
+@keyframes quake{0%,100%{transform:none}20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(3px,4px)}}
+.hitflash{animation:hitflash .35s ease-out}
+@keyframes hitflash{0%{filter:brightness(3) saturate(0)}100%{filter:none}}
+@media (prefers-reduced-motion:reduce){.slot.mz.alive,.slot.mz.alive .c-art .spr,.slot.mz.alive .c-art::after,.slot.mz.alive .c-art::before{animation:none!important}}
+/* ---- Duellturm ---- */
+.tw-wrap{max-width:720px;margin:0 auto;display:grid;gap:14px}
+.tw-hero{position:relative;padding:22px;border-radius:18px;text-align:center;background:linear-gradient(180deg,#1b1340,#0b0a1c);border:1px solid #7c5cff;box-shadow:0 0 30px #7c5cff44;overflow:hidden}
+.tw-hero h2{margin:0;font:800 40px system-ui;background:linear-gradient(90deg,#ffd86b,#fff,#ffd86b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tw-bar{height:14px;border-radius:9px;background:#0006;overflow:hidden;margin:12px 0 4px;border:1px solid #ffffff22}.tw-bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#ffd86b)}
+.tw-opp{display:flex;gap:14px;align-items:center;padding:14px;border-radius:14px;background:#141a2e;border:1px solid #2d3555}.tw-opp .bot-av{font-size:46px}.tw-opp div{flex:1}.tw-opp small{display:block;color:#aab}
+.tw-opp.boss{border-color:#ff5c5c;box-shadow:0 0 16px #ff5c5c55}
+.tw-ms{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}.tw-ms span{padding:6px;border-radius:9px;background:#0005;border:1px solid #ffffff18;font:600 12px system-ui;text-align:center}.tw-ms span.ok{border-color:#3fbf7f;color:#7dffb0}
+.tw-goal{padding:14px;border-radius:14px;background:linear-gradient(135deg,#3a2a05,#1a1405);border:1px solid #f5c542;text-align:center}
+/* ---- Deck-Shop ---- */
+.dk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.dk-card{border-radius:14px;overflow:hidden;background:#141a2e;border:1px solid #2d3555;display:flex;flex-direction:column}
+.dk-art{display:grid;grid-template-columns:repeat(3,1fr);height:96px}.dk-art>div{overflow:hidden}.dk-art .spr,.dk-art svg{width:100%;height:100%}
+.dk-card .dk-b{padding:10px;display:grid;gap:6px;flex:1}.dk-card small{color:#aab}
+
 .ev-card{border-color:#f5c542!important;box-shadow:0 0 12px #f5c54266}.evb{display:grid;gap:12px;max-width:640px;margin:0 auto}.evbot{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;background:#1a1f33;border:1px solid #2d3555}.evbot.done{opacity:.75;border-color:#3fbf7f}.evbot .bot-av{font-size:34px}.evbot div{flex:1}.evbot small{display:block;color:#aab}.evtime{text-align:center;font-weight:700;color:#f5c542}
 .crb{position:absolute;right:2px;bottom:2px;background:#3a0a40ee;color:#e9a6ff;font:700 10px system-ui;padding:1px 5px;border-radius:6px;border:1px solid #c45cff;box-shadow:0 0 6px #c45cff;z-index:3}
 #apptoast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,150%);z-index:9999;background:#1c1338f2;border:1px solid #c6ff3d88;box-shadow:0 8px 30px #000a;border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:92vw;transition:transform .35s;color:#fff}
@@ -555,6 +615,7 @@ details.onl-card summary{cursor:pointer}
     </div>
     <div class="home-side">
       <button class="hcard ev-card hidden" id="menu-event" data-nav="event"><span>🎪</span><div><b>Event: Schatzjagd von Asgard</b><small id="menu-ev"></small></div></button>
+      <button class="hcard" data-nav="turm"><span>🗼</span><div><b>Duellturm</b><small id="menu-tw"></small></div></button>
       <div class="hcard" id="menu-bonus"></div>
       <button class="hcard" data-nav="pass"><span>🎖</span><div><b>Battle Pass</b><small id="menu-pass"></small></div></button>
       <button class="hcard" data-nav="truhen"><span>🎁</span><div><b>Truhen</b><small id="menu-chest"></small></div></button>
@@ -581,9 +642,15 @@ details.onl-card summary{cursor:pointer}
   <div class="vt">📖 Solo</div>
   <div class="modes">
     <button class="mode" data-nav="geschichte" style="--bg:url(art9/0.jpg)"><b>Geschichte</b><small>18 Tore voller Duelle, Ziele und Herausforderungen</small></button>
+    <button class="mode" data-nav="turm" style="--bg:url(art9/0.jpg)"><b>🗼 Duellturm</b><small>1000 Etagen · ganz oben warten 10 Goldene Token, eine OP-Karte und 💎 1000</small></button>
     <button class="mode" data-nav="solo" style="--bg:url(art8/0-0.jpg)"><b>Freie Duelle</b><small>Fordere jeden Bot heraus, so oft du willst</small></button>
     <button class="mode" data-nav="regeln" style="--bg:url(art5/1-4.jpg)"><b>Regeln</b><small>Alle Regeln zum Nachlesen</small></button>
   </div>
+</section>
+
+<section id="v-turm" class="view">
+  <div class="vt">🗼 Duellturm</div>
+  <div id="turm"></div>
 </section>
 
 <section id="v-geschichte" class="view">
@@ -3626,6 +3693,7 @@ async function attack(i,att,tgt){if(NETG()&&i===0)return gcmd('attack',[att.uid,
   if(G.over)return;
   if(stopped||!P(i).mz.includes(att)){log('Der Angriff wurde gestoppt.');render();return}
   if(tgt&&!P(j).mz.includes(tgt)){log('Das Ziel ist verschwunden – der Angriff geht ins Leere.');return}
+  await atkAnim(i,att,tgt);
   if(!tgt){const d=battleDmg(j,att.atk,[att]);if(d&&!G.over&&P(i).mz.includes(att))await trigger(i,att.c,['bdmg'],{src:att});render();return}
   let flipped=false;if(tgt.faceDown){tgt.faceDown=false;flipped=true;log(`${tgt.c.name} wird aufgedeckt!`,'p'+j);fx('🔄 FLIPP!','#ffd86b');render();await sleep(400)}
   const A=att.atk;let kT=false,kA=false,dealt=0;
@@ -3658,7 +3726,7 @@ function newDuel(cfg={}){
   let warn='';
   if(main.length<20){main=[...DEFAULT_MAIN];extra=[...DEFAULT_EXTRA];warn='Dein Deck hat weniger als 20 Karten, deshalb spielst du mit einem Leihdeck.';}
   const od=cfg.oppDeck||{main:DEFAULT_MAIN,extra:DEFAULT_EXTRA};
-  G={p:[mkPlayer('Du',main,extra),mkPlayer(cfg.oppName||'Computer',od.main,od.extra)],cur:0,turnNo:0,phase:'main',ns:false,busy:false,over:false,attacker:null,log:[],aiLevel:cfg.aiLevel||3,respDepth:0,stopBattle:false};
+  G={p:[mkPlayer('Du',main,extra),mkPlayer(cfg.oppName||'Computer',od.main,od.extra)],cur:0,turnNo:0,phase:'main',ns:false,busy:false,over:false,attacker:null,log:[],aiLevel:cfg.aiLevel||3,respDepth:0,stopBattle:false};if(cfg.oppLP)G.p[1].lp=cfg.oppLP;
   if(od.bossId){const dk=G.p[1].deck;const k=dk.findIndex(h=>h.c.id===od.bossId);if(k>=0){const h=dk.splice(k,1)[0];dk.splice(Math.max(0,dk.length-5-(1+Math.floor(Math.random()*3))),0,h)}}
   if(!AUTO)$('#log').innerHTML='';
   if(cfg.title)log(cfg.title);
@@ -3937,7 +4005,8 @@ function render(){
     if(i===0&&G.attacker===m.uid)cls+=' sel';
     if(i===0&&my&&G.phase==='battle'){if(canAttack(m))cls+=' can';else cls+=' done'}
     if(i===1&&G.attacker&&my)cls+=' target';
-    return `<div class="${cls}" data-m="${i}:${m.uid}">${cardHTML(m.c,{size:'s',inst:m})}</div>`}).join('')}</div>`;
+    let sty='';if(!m.faceDown&&!isNeg(m)&&LIVE()){cls+=' alive'+(m.c.boss?' boss':'');sty=` style="--ac:${(ATTR[m.c.attr]||ATTR.licht)[2]};--ad:-${(Date.now()+m.uid*977)%6000}ms"`}
+    return `<div class="${cls}" data-m="${i}:${m.uid}"${sty}>${cardHTML(m.c,{size:'s',inst:m})}</div>`}).join('')}</div>`;
   const handPlayable=h=>{if(!my||!inMain())return false;const c=h.c;if(c.kind==='spell')return c.stype==='quick'?freeSZ(0)>=0:canPlaySpell(0,c);if(c.kind==='trap')return freeSZ(0)>=0;
     if(canAlt(0,h))return true;if(PR(c).noNormal)return false;const t=tribFor(c);return !G.ns&&(t===0?freeMZ(0)>=0:mons(0).length>=t)};
   const phaseTxt=G.over?'Duell beendet':G.cur===1?'Gegner ist am Zug…':G.phase==='main'?'Deine Hauptphase':'Deine Kampfphase';
@@ -4332,6 +4401,92 @@ const info=(title,html)=>modal({title,body:html,buttons:[{label:'OK',value:1,cls
 /* =========================================================
    Hauptmenü
    ========================================================= */
+/* ---------- Duellturm ---------- */
+const TW_MAX=1000;
+function towerS(){SAVE.tower=SAVE.tower||{floor:1,best:0,done:false,claimed:false};return SAVE.tower}
+const TW_DECKS=[['tw','Tempelwächter','🏛'],['sj','Schattenjäger','🗝'],['od','Asgard-Krieger','⚡'],['pa','Panda-Krieger','🐼'],['rj','Raritätenjäger','🧭'],['zombie','Zombie-Horde','🧟'],['ninja','Ninja-Clan','🥷'],['fluch','Fluch-Kult','☠️']];
+const TW_TITLES=['Wächter','Herausforderer','Champion','Meister','Veteran','Kämpfer','Hüter','Duellant'];
+function towerBot(f){
+  const r=rng(f*7919+13),boss=f%50===0,lvl=f===TW_MAX||boss&&f>=300?4:f<=30?1:f<=150?2:f<=450?3:4;
+  const useB=!boss&&r()<.45;
+  if(useB){const b=BOTS[Math.floor(r()*BOTS.length)];return {id:'tw'+f,name:`${b.name.split(',')[0]} – ${TW_TITLES[f%8]}`,av:b.av,lvl,f:b.f,boss,lp:towerLP(f),deck:()=>noOP(botDeck({...b,id:b.id+f,lvl}))}}
+  const [g,n,av]=TW_DECKS[Math.floor(r()*TW_DECKS.length)];const dl=Math.max(2,lvl);
+  const mk=()=>noOP(g==='zombie'?zombieDeck(dl):g==='ninja'?ninjaDeck(dl):g==='fluch'?fluchDeck(dl):archDeck(g,dl));
+  return {id:'tw'+f,name:f===TW_MAX?'Der Herr des Turms':boss?`Turmboss: ${n}-Fürst`:`${n} – ${TW_TITLES[f%8]}`,av:f===TW_MAX?'👑':av,lvl,boss,lp:towerLP(f),deck:mk};
+}
+const towerLP=f=>START_LP+Math.floor(f/100)*1000+(f%50===0?2000:0)+(f===TW_MAX?5000:0);
+function noOP(d){return {main:d.main.filter(id=>{const c=getCard(id);return c&&!opCached(c)}),extra:(d.extra||[]).filter(id=>{const c=getCard(id);return c&&!opCached(c)})}}
+const towerWinCry=f=>10+Math.floor(f/10);
+function renderTower(){
+  const el=$('#turm');if(!el)return;const t=towerS(),f=Math.min(t.floor,TW_MAX),b=towerBot(f);
+  const ms=[100,200,300,400,500,600,700,800,900].map(x=>`<span class="${t.best>=x?'ok':''}">Etage ${x}<br>💎 300</span>`).join('');
+  el.innerHTML=`<div class="tw-wrap"><div class="tw-hero"><small>${t.done?'Du hast den Turm bezwungen!':'Aktuelle Etage'}</small><h2>${t.done?'🏆 1000':f} <small style="font-size:16px;color:#aab">/ ${TW_MAX}</small></h2>
+    <div class="tw-bar"><i style="width:${(t.best/TW_MAX*100).toFixed(1)}%"></i></div><small class="note">Höchste Etage: ${t.best} · Verlierst du, versuchst du dieselbe Etage einfach nochmal.</small></div>
+    ${t.done?`<div class="tw-goal"><h3>🏆 Turm bezwungen!</h3><p>Du hast alle 1000 Etagen geschafft.${t.claimed?' Deine Belohnung hast du bekommen.':''}</p></div>`:
+    `<div class="tw-opp ${b.boss?'boss':''}"><span class="bot-av">${b.av}</span><div><b>${esc(b.name)}</b> ${b.boss?'<span style="color:#ff7b7b">BOSS</span>':''}<small>Stärke: ${'★'.repeat(b.lvl)}${'☆'.repeat(4-b.lvl)} · Gegner-LP: ${b.lp}</small><small>Sieg: 💎 ${towerWinCry(f)}${f%100===0&&f<TW_MAX?' + 💎 300 (Meilenstein)':''}</small></div><button class="btn pri" id="tw-go">⚔️ Kämpfen</button></div>`}
+    <div class="tw-goal"><b>🏆 Belohnung für Etage 1000</b><p>🟡 10 Goldene Token · 🃏 1 zufällige OP-Karte · 💎 1000</p></div>
+    <h3 class="shh">Meilensteine</h3><div class="tw-ms">${ms}</div></div>`;
+  const go=$('#tw-go');if(go)go.onclick=()=>towerFight();
+}
+async function towerFight(){const t=towerS();if(t.done)return;const f=t.floor,b=towerBot(f);
+  const ok=await startBotDuel(b,{title:`🗼 Duellturm – Etage ${f}`,back:'turm',onEnd:win=>{addXP(win?30+b.lvl*10:5);
+    if(!win){SAVE.stats.losses++;return `Etage ${f} nicht geschafft – versuch es gleich nochmal!`}
+    SAVE.stats.wins++;const T=towerS();if(T.floor!==f)return 'Gewonnen!';
+    let msg=`Etage ${f} geschafft! <b>💎 ${towerWinCry(f)}</b>`;addCrystals(towerWinCry(f));
+    if(f%100===0&&f<TW_MAX){addCrystals(300);msg+=` + <b>💎 300</b> Meilenstein-Bonus!`}
+    T.best=Math.max(T.best,f);
+    if(f>=TW_MAX){T.done=true;T.floor=TW_MAX;if(!T.claimed){T.claimed=true;SAVE.tokG=(SAVE.tokG||0)+10;addCrystals(1000);const pool=opPool(),c=pool[rand(pool.length)];const note=c?giveCardTok(c):'';
+      msg=`🏆 <b>DU HAST DEN DUELLTURM BEZWUNGEN!</b><br>Belohnung: <b>🟡 10 Goldene Token</b>, <b>💎 1000</b> und die OP-Karte <b>${c?esc(c.name):'–'}</b>${note?` <small>(${note})</small>`:''}!`;fx('🏆 TURM BEZWUNGEN!','#ffd700')}}
+    else T.floor=f+1;
+    persist();return msg}});
+}
+/* ---------- Deck-Shop ---------- */
+const DECK_OFFERS=[
+  {id:'pa',name:'Panda-Reich',icon:'🐼',price:2500,desc:'Pandas mit Bambusmarken, Fusion und Xyz.',b:()=>archDeck('pa',4)},
+  {id:'tw',name:'Tempelwächter',icon:'🏛',price:2500,desc:'Schutzsiegel, Synchro, Xyz und Fusion.',b:()=>archDeck('tw',4)},
+  {id:'sj',name:'Schattenjäger',icon:'🗝',price:2500,desc:'Reliktmarken machen die Jäger immer stärker.',b:()=>archDeck('sj',4)},
+  {id:'od',name:'Asgard',icon:'⚡',price:2500,desc:'Odin und die Krieger der Neun Welten.',b:()=>archDeck('od',4)},
+  {id:'zombie',name:'Zombie-Horde',icon:'🧟',price:2000,desc:'Untote, die immer wieder aufstehen.',b:()=>zombieDeck(4)},
+  {id:'ninja',name:'Ninja-Clan',icon:'🥷',price:2000,desc:'Schnelle Ninjas mit Tricks und Fallen.',b:()=>ninjaDeck(4)},
+  {id:'fluch',name:'Fluch-Kult',icon:'☠️',price:2000,desc:'Fluchmarken schwächen den Gegner.',b:()=>fluchDeck(4)},
+  {id:'rj',name:'Raritätenjäger & Wüste',icon:'🧭',price:1000,desc:'Starke Normalmonster für Einsteiger.',b:()=>archDeck('rj',2)},
+];
+function deckOffer(o){const d=noOP(o.b());const cnt={};[...d.main,...d.extra].forEach(id=>cnt[id]=Math.min(3,(cnt[id]||0)+1));return {d,cnt}}
+function deckShopHTML(){SAVE.deckBuy=SAVE.deckBuy||{};
+  return `<p class="note">Fertige Decks zum Sofort-Losspielen: Du bekommst <b>alle Karten</b> und das Deck wird direkt unter „Decks“ angelegt. <b>Keine OP-Karten</b> enthalten.</p><div class="dk-grid">`+DECK_OFFERS.map(o=>{const {d,cnt}=deckOffer(o);const ids=Object.keys(cnt);const art=ids.map(getCard).filter(c=>c&&c.kind==='monster').sort((a,b)=>b.atk-a.atk).slice(0,3);const bought=SAVE.deckBuy[o.id];
+    return `<div class="dk-card"><div class="dk-art">${art.map(c=>`<div>${artHTML(c)}</div>`).join('')}</div><div class="dk-b"><b>${o.icon} ${esc(o.name)}-Deck</b><small>${esc(o.desc)}</small><small>${d.main.length} Hauptdeck · ${d.extra.length} Extra-Deck · ${ids.length} verschiedene Karten</small>
+      ${bought?'<button class="btn" disabled>✅ Gekauft</button>':`<button class="btn pri" data-deckbuy="${o.id}" ${SAVE.crystals<o.price?'disabled':''}>Kaufen 💎 ${o.price}</button>`}</div></div>`}).join('')+'</div>'}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-deckbuy]');if(!b||b.disabled)return;const o=DECK_OFFERS.find(x=>x.id===b.dataset.deckbuy);if(!o)return;
+  SAVE.deckBuy=SAVE.deckBuy||{};if(SAVE.deckBuy[o.id])return;if(SAVE.crystals<o.price)return info('Zu wenig Kristalle','<p>Dafür brauchst du 💎 '+o.price+'.</p>');
+  const ok=await modal({title:`${o.icon} ${o.name}-Deck kaufen?`,body:`<p>Für <b>💎 ${o.price}</b> bekommst du alle Karten dieses Decks und es wird als neues Deck angelegt.</p>`,buttons:[{label:'Abbrechen',value:0},{label:'Kaufen',value:1,cls:'pri'}],dismiss:0});if(!ok)return;
+  const {d,cnt}=deckOffer(o);SAVE.crystals-=o.price;let neu=0;
+  Object.entries(cnt).forEach(([id,n])=>{const h=own(id);if(h===0)neu++;if(h<n)SAVE.owned[id]=n});
+  const nd={id:'d'+Date.now().toString(36),name:`${o.icon} ${o.name}`,main:d.main.slice(0,60),extra:d.extra.slice(0,15)};SAVE.decks.push(nd);SAVE.deckBuy[o.id]=Date.now();persist();updCrys();renderShop();
+  const r=await modal({title:'🗃 Deck gekauft!',body:`<p>Das Deck <b>${esc(nd.name)}</b> ist jetzt in deiner Sammlung. ${neu} neue Karten!</p>`,buttons:[{label:'OK',value:0},{label:'Als aktives Deck nutzen',value:1,cls:'pri'}],dismiss:0});
+  if(r){SAVE.active=nd.id;persist();appToast(`★ ${esc(nd.name)} ist jetzt dein aktives Deck.`,[{l:'OK'}])}});
+
+/* ---------- Lebendige Karten & Angriffs-Animation ---------- */
+const LIVE=()=>SAVE.live!==false;
+const HITC={feuer:'hf',wasser:'hw',wind:'hn',erde:'he',licht:'hl',finsternis:'hd',goettlich:'hg'};
+async function atkAnim(i,att,tgt){if(AUTO||!LIVE())return;
+  if(NET.on&&NET.role==='host')netSend({t:'atkfx',i,a:att.uid,b:tgt?tgt.uid:null,at:att.c.attr,atk:att.atk});
+  await doAtkFx(i,att.uid,tgt?tgt.uid:null,att.c.attr,att.atk)}
+async function doAtkFx(i,au,tu,attr,atk){
+  const a=document.querySelector(`[data-m="${i}:${au}"]`);const t=tu!=null?document.querySelector(`[data-m="${1-i}:${tu}"]`):document.querySelector('.plate.p'+(1-i));
+  if(!a||!t)return;const ac=(ATTR[attr]||ATTR.licht)[2];
+  const ra=a.getBoundingClientRect(),rt=t.getBoundingClientRect();const ax=ra.left+ra.width/2,ay=ra.top+ra.height/2,tx=rt.left+rt.width/2,ty=rt.top+rt.height/2;
+  const dx=(tx-ax)*.78,dy=(ty-ay)*.78;
+  a.style.setProperty('--ac',ac);a.classList.add('atk-lunge');
+  a.style.transition='transform .14s ease-in';a.style.transform=`translate(${-dx*.08}px,${-dy*.08}px) scale(1.12)`;await sleep(150);
+  a.style.transition='transform .2s cubic-bezier(.6,0,.9,.5)';a.style.transform=`translate(${dx}px,${dy}px) scale(1.18) rotate(${dx>0?6:-6}deg)`;
+  for(let k=1;k<=6;k++){setTimeout(()=>{const s=document.createElement('div');s.className='atkspark';s.style.cssText=`left:${ax+(tx-ax)*k/7}px;top:${ay+(ty-ay)*k/7}px;--ac:${ac}`;document.body.appendChild(s);setTimeout(()=>s.remove(),500)},k*28)}
+  await sleep(200);
+  const h=document.createElement('div');h.className='atkhit '+(HITC[attr]||'hl');h.style.left=tx+'px';h.style.top=ty+'px';document.body.appendChild(h);setTimeout(()=>h.remove(),800);
+  t.classList.add('hitflash');setTimeout(()=>t.classList.remove('hitflash'),400);
+  if(atk>=2500||attr==='erde'){const b=document.querySelector('#v-duell .board')||document.querySelector('.board');if(b){b.classList.remove('quake');void b.offsetWidth;b.classList.add('quake');setTimeout(()=>b.classList.remove('quake'),420)}}
+  await sleep(140);a.style.transition='transform .28s ease-out';a.style.transform='';await sleep(290);a.classList.remove('atk-lunge');a.style.transition='';
+}
+
 /* ---------- Event 1: Schatzjagd von Asgard (5 Tage) ---------- */
 const EV1={id:'ev1',end:Date.parse('2026-11-28T18:00:00+01:00'),bots:[
   {k:'e',id:'ev1-e',name:'Raritätenjäger-Scout',av:'🧭',lvl:1,diff:'Leicht',deck:()=>archDeck('rj',1),rew:'💎 500'},
@@ -4361,7 +4516,7 @@ document.addEventListener('click',e=>{const k=e.target.dataset&&e.target.dataset
     if(evClaims()[b.k]||!evActive())return 'Gewonnen! Die Event-Belohnung hast du bereits abgeholt.';
     evClaim(b.k);return 'Event-Sieg! Belohnung: '+evReward(b)}})});
 function renderEvMenu(){const b=$('#menu-event');if(!b)return;b.classList.toggle('hidden',!evActive());if(!evActive())return;const c=evClaims(),n=EV1.bots.filter(x=>c[x.k]).length;$('#menu-ev').textContent=`${n}/3 besiegt · noch ${evLeft()} · 🟡 Goldener Token!`}
-function renderMenu(){renderEvMenu();renderInstall();renderHomeLive();
+function renderMenu(){renderEvMenu();{const e=$('#menu-tw');if(e){const t=towerS();e.textContent=t.done?'🏆 Bezwungen!':`Etage ${t.floor} von 1000`}}renderInstall();renderHomeLive();
   const today=new Date().toDateString();
   $('#menu-bonus').innerHTML=SAVE.bonus!==today?`<span>🎁</span><div><b>Tagesbonus</b><small>💎 100 und Splitter</small></div><button class="btn pri sm" id="get-bonus">Abholen</button>`:`<span>✅</span><div><b>Tagesbonus</b><small>Morgen wieder!</small></div>`;
   const cards=allCards();
@@ -4520,12 +4675,13 @@ function packBanner(p,big){const hl=packHighlights(p,3);
     ${p.theme&&featuredPacks().includes(p)?`<span class="pb-time">⏱ noch ${weekLeft()} Tag(e)</span>`:''}${p.special?`<span class="pb-time">noch ${jubiLeft()}× diese Woche</span>`:''}</div>
     <span class="pb-price">1 Paket 💎 ${p.price}</span></button>`}
 function renderShop(){
-  const tabs=[['empf','Empfohlen'],['pakete','Pakete'],['spezial','🔷 Token & Spezial'],['kos','🎨 Hüllen & Felder'],['pres','✦ Prestige']];
+  const tabs=[['empf','Empfohlen'],['pakete','Pakete'],['decks','🗃 Decks'],['spezial','🔷 Token & Spezial'],['kos','🎨 Hüllen & Felder'],['pres','✦ Prestige']];
   let body='';
   if(SHOP_TAB==='empf')body=`<div class="shop-feat">${packBanner(featuredPacks()[0],true)}</div><div class="shop-row">${featuredPacks().slice(1).map(p=>packBanner(p)).join('')}${packBanner(SPECIAL_PACK)}</div>
     <p class="note">Die Auswahl-Pakete im Bereich „Empfohlen“ wechseln jede Woche. Alle Pakete findest du unter „Pakete“.</p>`;
   else if(SHOP_TAB==='pakete')body=`<h3 class="shh">Standard-Pakete</h3><div class="shop-grid">${PACKS.map(p=>packBanner(p)).join('')}</div><h3 class="shh">Auswahl-Pakete</h3><div class="shop-grid">${THEME_PACKS.map(p=>packBanner(p)).join('')}</div>`;
   else if(SHOP_TAB==='kos')body=cosShopHTML();
+  else if(SHOP_TAB==='decks')body=deckShopHTML();
   else if(SHOP_TAB==='pres')body=presShopHTML();
   else body=`${tokenShopHTML()}<div class="shop-feat">${packBanner(SPECIAL_PACK,true)}</div><div class="shop-row"><button class="pbanner mini" data-nav="tausch"><div class="pb-info"><span class="pb-kind">Splitter</span><b>🔄 Tausch-Shop</b><span class="pb-time">Splitter tauschen und kaufen</span></div></button><button class="pbanner mini" data-nav="truhen"><div class="pb-info"><span class="pb-kind">Belohnungen</span><b>🎁 Truhen</b><span class="pb-time">Truhen öffnen</span></div></button></div>`;
   $('#shop').innerHTML=`<div class="shop-tabs">${tabs.map(([k,l])=>`<button class="${k===SHOP_TAB?'on':''}" data-stab="${k}">${l}</button>`).join('')}<span class="shop-wal">💎 ${SAVE.crystals}</span></div>${body}`;
@@ -4685,7 +4841,7 @@ function deckOK(){const n=curDeck().main.filter(getCard).length;return n>=20&&n<
 async function startBotDuel(b,cfg={}){
   if(!deckOK()){const r=await modal({title:'Deck nicht bereit',body:`<p>Dein aktives Deck „${esc(curDeck().name)}“ braucht 20–60 Karten im Hauptdeck.</p>`,buttons:[{label:'Abbrechen',value:0},{label:'Zu den Decks',value:1,cls:'pri'}],dismiss:0});if(r)go('decks');return false}
   await go('duell');
-  newDuel({oppName:b.name,avatar:b.av,oppDeck:b.deck?b.deck():botDeck(b),aiLevel:b.lvl,title:cfg.title||('Solo-Duell gegen '+b.name),onEnd:cfg.onEnd||(win=>soloReward(b,win)),back:cfg.back||'solo'});
+  newDuel({oppName:b.name,avatar:b.av,oppLP:b.lp,oppDeck:b.deck?b.deck():botDeck(b),aiLevel:b.lvl,title:cfg.title||('Solo-Duell gegen '+b.name),onEnd:cfg.onEnd||(win=>soloReward(b,win)),back:cfg.back||'solo'});
   if(G)G.oppSleeve=b.sleeve||SLEEVES[1+(b.id.length%5)].id;
   return true;
 }
@@ -5245,13 +5401,13 @@ async function go(v){
   VIEW=v;
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
   $('#btn-menu').classList.add('hidden');
-  const GRP={event:'home',pass:'home',menu:'home',profil:'home',solomenu:'solo',geschichte:'solo',solo:'solo',regeln:'solo',turnier:'duel',online:'duel',decks:'deck',sammlung:'deck',shop:'shop',truhen:'shop',tausch:'shop'};
-  const SUB={home:[['menu','Start'],...(evActive()?[['event','🎪 Event']]:[]),['profil','Profil'],['pass','Battle Pass']],solo:[['solomenu','Übersicht'],['geschichte','Geschichte'],['solo','Freie Duelle'],['regeln','Regeln']],duel:[['turnier','Turnier'],['online','Online'],['solo','Freie Duelle']],deck:[['decks','Decks'],['sammlung','Sammlung & Werkstatt']],shop:[['shop','Kartenpakete'],['truhen','Truhen'],['tausch','Tausch-Shop']]};
+  const GRP={event:'home',pass:'home',menu:'home',profil:'home',solomenu:'solo',geschichte:'solo',turm:'solo',solo:'solo',regeln:'solo',turnier:'duel',online:'duel',decks:'deck',sammlung:'deck',shop:'shop',truhen:'shop',tausch:'shop'};
+  const SUB={home:[['menu','Start'],...(evActive()?[['event','🎪 Event']]:[]),['profil','Profil'],['pass','Battle Pass']],solo:[['solomenu','Übersicht'],['geschichte','Geschichte'],['turm','🗼 Turm'],['solo','Freie Duelle'],['regeln','Regeln']],duel:[['turnier','Turnier'],['online','Online'],['solo','Freie Duelle']],deck:[['decks','Decks'],['sammlung','Sammlung & Werkstatt']],shop:[['shop','Kartenpakete'],['truhen','Truhen'],['tausch','Tausch-Shop']]};
   const g=GRP[v];document.querySelectorAll('#botnav button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
   document.body.classList.toggle('in-duel',v==='duell');
   $('#subtabs').innerHTML=(SUB[g]||[]).map(([k,l])=>`<button data-nav="${k}" class="${k===v?'on':''}">${l}</button>`).join('');
   renderProfile();
-  ({event:renderEvent,profil:renderProfil,pass:renderPass,tausch:renderTausch,geschichte:renderStory,truhen:renderChests,menu:renderMenu,solo:renderSolo,turnier:renderTour,online:renderOnline,shop:renderShop,decks:renderDecks,sammlung:renderColl}[v]||(()=>{}))();
+  ({turm:renderTower,event:renderEvent,profil:renderProfil,pass:renderPass,tausch:renderTausch,geschichte:renderStory,truhen:renderChests,menu:renderMenu,solo:renderSolo,turnier:renderTour,online:renderOnline,shop:renderShop,decks:renderDecks,sammlung:renderColl}[v]||(()=>{}))();
   updCrys();window.scrollTo(0,0);
 }
 document.addEventListener('click',e=>{const n=e.target.closest('[data-nav]');if(n){e.preventDefault();go(n.dataset.nav)}});
@@ -5362,6 +5518,7 @@ function netMsg(m){
   if(m.t==='snap')return guestSnap(m.s);
   if(m.t==='ask')return guestAsk(m);
   if(m.t==='fx')return fx(m.text,m.color);
+  if(m.t==='atkfx'){if(LIVE())doAtkFx(1-m.i,m.a,m.b,m.at,m.atk);return}
   if(m.t==='ban')return phaseBanner(m.text,m.i);
   if(m.t==='over'){const win=m.winner===1;friendDuelEnded();netReward(win);setTimeout(async()=>{await modal({title:win?'🏆 Sieg!':'💀 Niederlage',body:`<p>${esc(swapTxt(m.why||''))}</p><p>${win?'Du hast deinen Freund besiegt!':'Dein Freund hat gewonnen.'} +💎 ${win?50:15}</p>`,buttons:[{label:'Weiter',value:1,cls:'pri'}]});go('online')},500)}
 }
@@ -5452,8 +5609,8 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.3.0';
-const CHANGELOG={'1.3.0':['🐼 Neues Pandadeck: 86 Panda-Karten mit 🎋 Bambusmarken, Fusion, Xyz, Spielfeld und Anti-OP-Karten', '🎁 Geschenk für alle: 💎 500 und 🔷 1 Blauer Token'],'1.2.1':['📲 App installieren jetzt gut sichtbar auf der Startseite – mit Anleitung für iPhone, Android und PC', '👥 Startseite zeigt, welche Freunde gerade online sind (mit Einladen-Knopf)', '🟢 Meldung, wenn ein Freund online kommt'],'1.2.0':['🃏 200 neue Karten: Tempelwächter, Odin & Asgard, Schattenjäger, Raritätenjäger und Wüsten-Monster', '🛡 Neu: Schutzsiegel (Tempelwächter) und 💎 Reliktmarken (Schattenjäger)', '📖 3 neue Tore in der Geschichte – mit exklusiven Avataren', '🎪 Erstes Event „Schatzjagd von Asgard“ (5 Tage): 3 Gegner, 💎 1500, 🟡 1 Goldener Token, 🔷 2 Blaue Token und Odin-Avatar'],'1.1.3':['🟡 Goldene Ziehung gibt jetzt garantiert 1 OP-Karte (1 : 131)'],'1.1.2':['⚖️ OP-Karten (rotes OP-Zeichen) gibt es nur noch über die 🟡 Goldene Ziehung','🔨 OP-Karten können nicht mehr mit Splittern hergestellt werden','📦 Pakete, Truhen, OP-Kiste und Regenbogen-Kiste geben stattdessen starke, normale Karten','Karten, die du schon besitzt, bleiben natürlich erhalten'],'1.1.1':['📖 Neues Tor: „Die verfluchten Sandgräber“ – besiege Nekharion (💎 100 + exklusiver Fluch-Avatar)'],'1.1.0':['☠ 60 neue Fluch-Karten mit neuer Mechanik: Fluchmarken (☠ auf den Monstern)','Effekt-Monster, Empfänger, Fusion, Xyz/Rang, Zauber & Fallen','Update-Geschenk: 💎 100 Kristalle'],'1.0.9':['🧪 Test-Update: Der Update-Knopf funktioniert!','Update-Geschenk: 💎 100 Kristalle'],'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+const APP_VER='1.4.0';
+const CHANGELOG={'1.4.0':['✨ Lebendige Karten: Monster auf dem Feld atmen, leuchten und funkeln in ihrer Element-Farbe', '⚔️ Neue Angriffs-Animationen passend zum Element (Feuer, Wasser, Wind, Erde, Licht, Finsternis, Göttlich)', '🗼 Neuer Spielmodus Duellturm: 1000 Etagen – oben warten 10 Goldene Token, eine OP-Karte und 💎 1000', '🗃 Im Shop kannst du jetzt fertige Decks kaufen (ohne OP-Karten)'],'1.3.0':['🐼 Neues Pandadeck: 86 Panda-Karten mit 🎋 Bambusmarken, Fusion, Xyz, Spielfeld und Anti-OP-Karten', '🎁 Geschenk für alle: 💎 500 und 🔷 1 Blauer Token'],'1.2.1':['📲 App installieren jetzt gut sichtbar auf der Startseite – mit Anleitung für iPhone, Android und PC', '👥 Startseite zeigt, welche Freunde gerade online sind (mit Einladen-Knopf)', '🟢 Meldung, wenn ein Freund online kommt'],'1.2.0':['🃏 200 neue Karten: Tempelwächter, Odin & Asgard, Schattenjäger, Raritätenjäger und Wüsten-Monster', '🛡 Neu: Schutzsiegel (Tempelwächter) und 💎 Reliktmarken (Schattenjäger)', '📖 3 neue Tore in der Geschichte – mit exklusiven Avataren', '🎪 Erstes Event „Schatzjagd von Asgard“ (5 Tage): 3 Gegner, 💎 1500, 🟡 1 Goldener Token, 🔷 2 Blaue Token und Odin-Avatar'],'1.1.3':['🟡 Goldene Ziehung gibt jetzt garantiert 1 OP-Karte (1 : 131)'],'1.1.2':['⚖️ OP-Karten (rotes OP-Zeichen) gibt es nur noch über die 🟡 Goldene Ziehung','🔨 OP-Karten können nicht mehr mit Splittern hergestellt werden','📦 Pakete, Truhen, OP-Kiste und Regenbogen-Kiste geben stattdessen starke, normale Karten','Karten, die du schon besitzt, bleiben natürlich erhalten'],'1.1.1':['📖 Neues Tor: „Die verfluchten Sandgräber“ – besiege Nekharion (💎 100 + exklusiver Fluch-Avatar)'],'1.1.0':['☠ 60 neue Fluch-Karten mit neuer Mechanik: Fluchmarken (☠ auf den Monstern)','Effekt-Monster, Empfänger, Fusion, Xyz/Rang, Zauber & Fallen','Update-Geschenk: 💎 100 Kristalle'],'1.0.9':['🧪 Test-Update: Der Update-Knopf funktioniert!','Update-Geschenk: 💎 100 Kristalle'],'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
 setTimeout(()=>{try{if(!SAVE.gPanda){SAVE.gPanda=1;addCrystals(500);SAVE.tokB=(SAVE.tokB||0)+1;persist();updCrys();setTimeout(()=>appToast('🐼 <b>Neues Pandadeck!</b> Geschenk für dich: 💎 500 und 🔷 1 Blauer Token',[{l:'Danke!'}]),2500)}}catch(e){}
   try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const st=SAVE.stats||{},old=!!v||(st.wins||0)+(st.losses||0)+(st.packs||0)>0;const gift=old&&CHANGELOG[APP_VER]&&APP_VER!=='1.3.0';if(gift)addCrystals(100);persist();updCrys();
   if(old)info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
@@ -6019,8 +6176,9 @@ document.addEventListener('click',e=>{if(e.target.closest('#btn-update'))openUpd
 setTimeout(()=>checkUpdate(true),2500);setInterval(()=>checkUpdate(true),15*60*1000);
 
 async function resetGame(){
-  const r=await modal({title:'⚙️ Einstellungen',body:`<p>Hier kannst du dein ganzes Spiel <b>von vorne beginnen</b>.</p><p class="note">Dabei wird alles gelöscht: Karten, Decks, Kristalle, Splitter, Truhen, Geschichte, Battle Pass und Statistiken. Du startest wieder mit dem Starterdeck.</p>`,
-    buttons:[{label:'Abbrechen',value:0},{label:'🔄 Spiel zurücksetzen',value:1,cls:'pri'}],dismiss:0});
+  const r=await modal({title:'⚙️ Einstellungen',body:`<p><b>✨ Lebendige Karten & Angriffs-Animationen</b>: ${LIVE()?'an':'aus'}</p><hr style="opacity:.2"><p>Hier kannst du dein ganzes Spiel <b>von vorne beginnen</b>.</p><p class="note">Dabei wird alles gelöscht: Karten, Decks, Kristalle, Splitter, Truhen, Geschichte, Battle Pass und Statistiken. Du startest wieder mit dem Starterdeck.</p>`,
+    buttons:[{label:'Abbrechen',value:0},{label:LIVE()?'✨ Animationen ausschalten':'✨ Animationen einschalten',value:2},{label:'🔄 Spiel zurücksetzen',value:1,cls:'pri'}],dismiss:0});
+  if(r===2){SAVE.live=!LIVE();persist();return appToast(`✨ Animationen ${LIVE()?'eingeschaltet':'ausgeschaltet'}.`,[{l:'OK'}])}
   if(!r)return;
   const r2=await modal({title:'Wirklich zurücksetzen?',body:'<p><b>Das kann nicht rückgängig gemacht werden!</b> Dein kompletter Fortschritt geht verloren.</p>',buttons:[{label:'Nein, behalten',value:0,cls:'pri'},{label:'Ja, alles löschen',value:1}],dismiss:0});
   if(!r2)return;
