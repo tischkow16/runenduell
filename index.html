@@ -531,7 +531,7 @@ details.onl-card summary{cursor:pointer}
 .inst-bar{display:flex;align-items:center;gap:12px;margin:10px 0;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,#2a1a55,#152a55);border:1px solid #7c5cff;box-shadow:0 0 16px #7c5cff55}.inst-bar.hidden{display:none}.inst-bar .ib-ic{font-size:30px}.inst-bar div{flex:1}.inst-bar small{display:block;color:#c9c3ee}
 .hlive{display:grid;gap:10px;margin:10px 0}.hl-box{padding:10px 14px;border-radius:14px;background:#141a2e;border:1px solid #2d3555}.hl-box.own{border-color:#f5c542;background:#231c0e}.hl-box h4{margin:0 0 6px;font:700 14px system-ui}.hl-chips{display:flex;flex-wrap:wrap;gap:6px}.hl-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#0008;border:1px solid #ffffff22;font:600 13px system-ui}.hl-chip button{padding:2px 8px}.hl-chip small{opacity:.7}
 /* ---- Lebendige Karten ---- */
-.slot.mz.alive .c-art .spr,.slot.mz.alive .c-art>svg,.slot.mz.alive .c-art>img{animation:breathe 4.2s ease-in-out infinite;animation-delay:var(--ad,0s);transform-origin:50% 60%}
+.slot.mz.alive.noholo .c-art .spr,.slot.mz.alive.noholo .c-art>svg,.slot.mz.alive.noholo .c-art>img{animation:breathe 4.2s ease-in-out infinite;animation-delay:var(--ad,0s);transform-origin:50% 60%}
 @keyframes breathe{0%,100%{transform:scale(1.02) translate(0,0)}25%{transform:scale(1.06) translate(-1.2%,-1.5%)}50%{transform:scale(1.09) translate(0,-2.5%)}75%{transform:scale(1.06) translate(1.2%,-1.2%)}}
 .slot.mz.alive .c-art::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;opacity:.85;
   background-image:radial-gradient(circle,var(--ac) 0 1px,transparent 2px),radial-gradient(circle,#fff 0 .8px,transparent 1.6px),radial-gradient(circle,var(--ac) 0 1.3px,transparent 2.4px);
@@ -575,6 +575,39 @@ details.onl-card summary{cursor:pointer}
 .hitflash{animation:hitflash .35s ease-out}
 @keyframes hitflash{0%{filter:brightness(3) saturate(0)}100%{filter:none}}
 @media (prefers-reduced-motion:reduce){.slot.mz.alive,.slot.mz.alive .c-art .spr,.slot.mz.alive .c-art::after,.slot.mz.alive .c-art::before{animation:none!important}}
+/* ---- Münzwurf ---- */
+.coin3d{perspective:700px;height:150px;display:grid;place-items:center;margin:6px 0 10px}
+.coin{width:120px;height:120px;position:relative;transform-style:preserve-3d;animation:coinK 1.6s cubic-bezier(.2,.7,.3,1) forwards}
+.coin.z{animation-name:coinZ}
+.coin .cf{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;font:800 22px system-ui;color:#5a3d00;backface-visibility:hidden;
+  background:radial-gradient(circle at 35% 30%,#fff6c8,#ffd54f 40%,#c99a1c 75%,#8a6510);box-shadow:inset 0 0 0 6px #e8b830,inset 0 0 0 9px #8a6510,0 8px 20px #0008}
+.coin .cf.t{transform:rotateY(180deg)}
+.coin .cf small{display:block;font-size:12px;text-align:center}
+@keyframes coinK{0%{transform:translateY(40px) rotateY(0) scale(.6)}40%{transform:translateY(-50px) rotateY(1080deg) scale(1)}100%{transform:translateY(0) rotateY(1800deg) scale(1)}}
+@keyframes coinZ{0%{transform:translateY(40px) rotateY(0) scale(.6)}40%{transform:translateY(-50px) rotateY(1080deg) scale(1)}100%{transform:translateY(0) rotateY(1980deg) scale(1)}}
+.toss-res{text-align:center;opacity:0;animation:tossIn .4s 1.5s forwards}@keyframes tossIn{to{opacity:1}}
+/* ---- Monster erscheinen (Hologramm) ---- */
+.holo{position:absolute;left:-8%;width:116%;bottom:42%;height:135%;z-index:6;pointer-events:none;transform-origin:50% 100%}
+.holo-in{position:absolute;inset:0;transform-origin:50% 100%;-webkit-mask-image:radial-gradient(ellipse 50% 52% at 50% 48%,#000 58%,transparent 76%);mask-image:radial-gradient(ellipse 50% 52% at 50% 48%,#000 58%,transparent 76%);filter:drop-shadow(0 0 6px var(--ac,#fff)) saturate(1.15)}
+.holo-in .spr,.holo-in svg,.holo-in img{width:100%;height:100%;background-size:inherit}
+.holo-sh{position:absolute;left:12%;right:12%;bottom:-6%;height:16%;border-radius:50%;background:radial-gradient(ellipse,#000a,transparent 70%)}
+.holo::before{content:'';position:absolute;left:18%;right:18%;bottom:0;height:70%;background:linear-gradient(0deg,var(--ac,#fff8),transparent);opacity:.25;filter:blur(4px);border-radius:40%}
+.holo.st .holo-in{animation:hbob 3.4s ease-in-out infinite;animation-delay:var(--ad,0s)}
+@keyframes hbob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-4%) scale(1.02,1.03)}}
+.holo.cr .holo-in{transform:translateY(14%) scale(1.06,.66)}
+.holo.cr::after{content:'';position:absolute;left:-4%;right:-4%;bottom:-8%;height:85%;border-radius:50% 50% 40% 40%;border:2px solid #7fd3ff;background:radial-gradient(ellipse at 50% 70%,#7fd3ff33,transparent 70%);box-shadow:0 0 12px #2e86de,inset 0 0 10px #2e86de66;animation:shield 2.4s ease-in-out infinite}
+@keyframes shield{50%{opacity:.55}}
+.holo.rise .holo-in{animation:hrise .75s cubic-bezier(.2,.9,.3,1.2) both;animation-delay:var(--rd,0s)}
+@keyframes hrise{0%{transform:translateY(30%) scale(.1,0);opacity:0;filter:brightness(4)}60%{opacity:1;filter:brightness(2)}100%{transform:none;opacity:1}}
+.holo.rise::before{animation:pillar .9s ease-out both;animation-delay:var(--rd,0s)}
+@keyframes pillar{0%{opacity:1;height:160%;left:5%;right:5%}100%{opacity:.25}}
+.holo.tocr .holo-in{animation:htocr .45s ease-out both;animation-delay:var(--rd,0s)}
+@keyframes htocr{from{transform:none}to{transform:translateY(14%) scale(1.06,.66)}}
+.holo.tost .holo-in{animation:htost .5s cubic-bezier(.3,1.4,.5,1) both;animation-delay:var(--rd,0s)}
+@keyframes htost{from{transform:translateY(14%) scale(1.06,.66)}to{transform:none}}
+.slot.mz .card{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.holo .holo-in,.holo::before,.holo::after{animation:none!important}}
+
 /* ---- Duellturm ---- */
 .tw-wrap{max-width:720px;margin:0 auto;display:grid;gap:14px}
 .tw-hero{position:relative;padding:22px;border-radius:18px;text-align:center;background:linear-gradient(180deg,#1b1340,#0b0a1c);border:1px solid #7c5cff;box-shadow:0 0 30px #7c5cff44;overflow:hidden}
@@ -3734,7 +3767,8 @@ function newDuel(cfg={}){
   if(warn)log(warn);
   for(let k=0;k<5;k++){drawCard(0,true);drawCard(1,true)}
   if(!AUTO)showDetail(null);
-  startTurn(0);
+  HOLO={};
+  if(AUTO)startTurn(0);else coinToss().then(f=>{if(f>=0&&G&&!G.over)startTurn(f)});
 }
 async function startTurn(i){
   if(G.over)return;
@@ -4005,8 +4039,10 @@ function render(){
     if(i===0&&G.attacker===m.uid)cls+=' sel';
     if(i===0&&my&&G.phase==='battle'){if(canAttack(m))cls+=' can';else cls+=' done'}
     if(i===1&&G.attacker&&my)cls+=' target';
-    let sty='';if(!m.faceDown&&!isNeg(m)&&LIVE()){cls+=' alive'+(m.c.boss?' boss':'');sty=` style="--ac:${(ATTR[m.c.attr]||ATTR.licht)[2]};--ad:-${(Date.now()+m.uid*977)%6000}ms"`}
-    return `<div class="${cls}" data-m="${i}:${m.uid}"${sty}>${cardHTML(m.c,{size:'s',inst:m})}</div>`}).join('')}</div>`;
+    let sty='',holo='';const ac=(ATTR[m.c.attr]||ATTR.licht)[2];
+    if(!m.faceDown&&!isNeg(m)&&LIVE()){cls+=' alive'+(m.c.boss?' boss':'');sty=` style="--ac:${ac};--ad:-${(Date.now()+m.uid*977)%6000}ms"`}
+    if(!m.faceDown&&LIVE()&&!AUTO)holo=holoHTML(m,ac);else if(!m.faceDown)cls+=' noholo';
+    return `<div class="${cls}" data-m="${i}:${m.uid}"${sty}>${cardHTML(m.c,{size:'s',inst:m})}${holo}</div>`}).join('')}</div>`;
   const handPlayable=h=>{if(!my||!inMain())return false;const c=h.c;if(c.kind==='spell')return c.stype==='quick'?freeSZ(0)>=0:canPlaySpell(0,c);if(c.kind==='trap')return freeSZ(0)>=0;
     if(canAlt(0,h))return true;if(PR(c).noNormal)return false;const t=tribFor(c);return !G.ns&&(t===0?freeMZ(0)>=0:mons(0).length>=t)};
   const phaseTxt=G.over?'Duell beendet':G.cur===1?'Gegner ist am Zug…':G.phase==='main'?'Deine Hauptphase':'Deine Kampfphase';
@@ -4021,7 +4057,10 @@ function render(){
     if(i===0&&G.attacker===m.uid)cls+=' sel';
     if(i===0&&my&&G.phase==='battle'){if(canAttack(m))cls+=' can';else cls+=' done'}
     if(i===1&&G.attacker&&my)cls+=' target';
-    return `<div class="${cls}" data-m="${i}:${m.uid}">${m.faceDown?cardHTML(null,{back:true,side:i,size:'s'})+(i===0?'<span class="fdmark">👁</span>':''):cardHTML(m.c,{size:'s',inst:m})}${m.ctr&&!m.faceDown?`<span class="ctrb">⏳${m.ctr}</span>`:''}${m.lvMod&&!m.faceDown?`<span class="lvb">★${lvOf(m)}</span>`:''}${m.curse>0?`<span class="crb">☠${m.curse}</span>`:''}</div>`};
+    let sty='',holo='';const ac=(ATTR[m.c.attr]||ATTR.licht)[2];
+    if(!m.faceDown&&!isNeg(m)&&LIVE()){cls+=' alive'+(m.c.boss?' boss':'');sty=` style="--ac:${ac};--ad:-${(Date.now()+m.uid*977)%6000}ms"`}
+    if(!m.faceDown&&LIVE()&&!AUTO)holo=holoHTML(m,ac);else if(!m.faceDown)cls+=' noholo';
+    return `<div class="${cls}" data-m="${i}:${m.uid}"${sty}>${m.faceDown?cardHTML(null,{back:true,side:i,size:'s'})+(i===0?'<span class="fdmark">👁</span>':''):cardHTML(m.c,{size:'s',inst:m})}${holo}${m.ctr&&!m.faceDown?`<span class="ctrb">⏳${m.ctr}</span>`:''}${m.lvMod&&!m.faceDown?`<span class="lvb">★${lvOf(m)}</span>`:''}${m.curse>0?`<span class="crb">☠${m.curse}</span>`:''}</div>`};
   const stz=(i,s,k)=>`<div class="mdz st ${s&&s.eqTo?'eq':''}">${stCard(i,s,k)}</div>`;
   const rev=a=>a.slice().reverse();
   const banB=i=>`<button class="banb" data-ban="${i}" title="Verbannte Karten">⊘ ${P(i).ban.length}</button>`;
@@ -4464,6 +4503,37 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-deck
   const nd={id:'d'+Date.now().toString(36),name:`${o.icon} ${o.name}`,main:d.main.slice(0,60),extra:d.extra.slice(0,15)};SAVE.decks.push(nd);SAVE.deckBuy[o.id]=Date.now();persist();updCrys();renderShop();
   const r=await modal({title:'🗃 Deck gekauft!',body:`<p>Das Deck <b>${esc(nd.name)}</b> ist jetzt in deiner Sammlung. ${neu} neue Karten!</p>`,buttons:[{label:'OK',value:0},{label:'Als aktives Deck nutzen',value:1,cls:'pri'}],dismiss:0});
   if(r){SAVE.active=nd.id;persist();appToast(`★ ${esc(nd.name)} ist jetzt dein aktives Deck.`,[{l:'OK'}])}});
+
+/* ---------- Monster erscheinen als Hologramm ---------- */
+let HOLO={};
+function holoHTML(m,ac){const now=Date.now(),h=HOLO[m.uid];let k='',t=now;
+  if(!h){k='rise';HOLO[m.uid]={pos:m.pos,t:now,k}}else if(h.pos!==m.pos){k=m.pos==='def'?'tocr':'tost';HOLO[m.uid]={pos:m.pos,t:now,k}}else if(now-h.t<900){k=h.k;t=h.t}
+  const el=now-t,base=m.pos==='def'?'cr':'st';
+  return `<div class="holo ${base} ${k}" style="--ac:${ac};--rd:-${el}ms"><div class="holo-in">${artHTML(m.c)}</div><i class="holo-sh"></i></div>`}
+/* ---------- Münzwurf vor dem Duell ---------- */
+const coinHTML=face=>`<div class="coin3d"><div class="coin ${face==='Zahl'?'z':''}"><span class="cf h">🪙<small>KOPF</small></span><span class="cf t">🐾<small>ZAHL</small></span></div></div>`;
+async function coinToss(){
+  const g=G;g.busy=true;render();await sleep(300);
+  const w=Math.random()<.5?0:1,online=DUEL.online&&NET.on&&NET.role==='host',opp=online?(NET.oppName||'Dein Freund'):(DUEL.oppName||g.p[1].name||'Der Gegner');
+  const btns=[{label:'▶ Als Erster anfangen',value:'a',cls:'pri',disabled:true},{label:'⏸ Als Zweiter anfangen',value:'b',disabled:true}];
+  const en=()=>setTimeout(()=>document.querySelectorAll('#m-btns button').forEach(b=>b.disabled=false),1500);
+  let first=0;
+  if(w===0){
+    const v=await modal({title:'🪙 Münzwurf',body:coinHTML('Zahl')+`<p class="toss-res"><b>Zahl</b> – du hast gewonnen! 🎉<br>Willst du als Erster oder als Zweiter anfangen?</p><p class="note" style="text-align:center">Kopf = Gegner · Zahl = du</p>`,buttons:btns,dismiss:'a',onMount:en});
+    first=v==='b'?1:0;
+    if(online)netSend({t:'tossInfo',txt:`🪙 Kopf – ${esc(prof().name||'Dein Freund')} hat den Münzwurf gewonnen und beginnt als ${first===0?'Erster':'Zweiter'}.`});
+  }else if(online){
+    appToast(`🪙 Kopf – ${esc(opp)} hat den Münzwurf gewonnen und wählt…`,[{l:'OK'}]);
+    let v=null;try{v=await netAsk('modal',{spec:{title:'🪙 Münzwurf',body:coinHTML('Zahl')+`<p class="toss-res"><b>Zahl</b> – du hast gewonnen! 🎉<br>Willst du als Erster oder als Zweiter anfangen?</p><p class="note" style="text-align:center">Kopf = Gegner · Zahl = du</p>`,buttons:btns.map(b=>({...b,disabled:false})),dismiss:'a'}})}catch(e){}
+    first=v==='b'?0:1;
+    appToast(`🪙 ${esc(opp)} beginnt als ${first===1?'Erster':'Zweiter'}.`,[{l:'OK'}]);
+  }else{
+    first=Math.random()<.7?1:0;
+    await modal({title:'🪙 Münzwurf',body:coinHTML('Kopf')+`<p class="toss-res"><b>Kopf</b> – ${esc(opp)} hat den Münzwurf gewonnen<br>und beginnt als <b>${first===1?'Erster':'Zweiter'}</b>.</p><p class="note" style="text-align:center">Kopf = Gegner · Zahl = du</p>`,buttons:[{label:'Los geht’s!',value:1,cls:'pri',disabled:true}],dismiss:1,onMount:en});
+  }
+  if(G!==g)return -1;
+  g.busy=false;log(first===0?'🪙 Du beginnst als Erster.':'🪙 Der Gegner beginnt als Erster.','sys');return first;
+}
 
 /* ---------- Lebendige Karten & Angriffs-Animation ---------- */
 const LIVE=()=>SAVE.live!==false;
@@ -5518,6 +5588,7 @@ function netMsg(m){
   if(m.t==='snap')return guestSnap(m.s);
   if(m.t==='ask')return guestAsk(m);
   if(m.t==='fx')return fx(m.text,m.color);
+  if(m.t==='tossInfo'){appToast(m.txt,[{l:'OK'}]);return}
   if(m.t==='atkfx'){if(LIVE())doAtkFx(1-m.i,m.a,m.b,m.at,m.atk);return}
   if(m.t==='ban')return phaseBanner(m.text,m.i);
   if(m.t==='over'){const win=m.winner===1;friendDuelEnded();netReward(win);setTimeout(async()=>{await modal({title:win?'🏆 Sieg!':'💀 Niederlage',body:`<p>${esc(swapTxt(m.why||''))}</p><p>${win?'Du hast deinen Freund besiegt!':'Dein Freund hat gewonnen.'} +💎 ${win?50:15}</p>`,buttons:[{label:'Weiter',value:1,cls:'pri'}]});go('online')},500)}
@@ -5609,8 +5680,8 @@ $('#online').addEventListener('click',async e=>{
 });
 
 /* ---------- App: Installieren, Updates, Spielstand sichern ---------- */
-const APP_VER='1.4.0';
-const CHANGELOG={'1.4.0':['✨ Lebendige Karten: Monster auf dem Feld atmen, leuchten und funkeln in ihrer Element-Farbe', '⚔️ Neue Angriffs-Animationen passend zum Element (Feuer, Wasser, Wind, Erde, Licht, Finsternis, Göttlich)', '🗼 Neuer Spielmodus Duellturm: 1000 Etagen – oben warten 10 Goldene Token, eine OP-Karte und 💎 1000', '🗃 Im Shop kannst du jetzt fertige Decks kaufen (ohne OP-Karten)'],'1.3.0':['🐼 Neues Pandadeck: 86 Panda-Karten mit 🎋 Bambusmarken, Fusion, Xyz, Spielfeld und Anti-OP-Karten', '🎁 Geschenk für alle: 💎 500 und 🔷 1 Blauer Token'],'1.2.1':['📲 App installieren jetzt gut sichtbar auf der Startseite – mit Anleitung für iPhone, Android und PC', '👥 Startseite zeigt, welche Freunde gerade online sind (mit Einladen-Knopf)', '🟢 Meldung, wenn ein Freund online kommt'],'1.2.0':['🃏 200 neue Karten: Tempelwächter, Odin & Asgard, Schattenjäger, Raritätenjäger und Wüsten-Monster', '🛡 Neu: Schutzsiegel (Tempelwächter) und 💎 Reliktmarken (Schattenjäger)', '📖 3 neue Tore in der Geschichte – mit exklusiven Avataren', '🎪 Erstes Event „Schatzjagd von Asgard“ (5 Tage): 3 Gegner, 💎 1500, 🟡 1 Goldener Token, 🔷 2 Blaue Token und Odin-Avatar'],'1.1.3':['🟡 Goldene Ziehung gibt jetzt garantiert 1 OP-Karte (1 : 131)'],'1.1.2':['⚖️ OP-Karten (rotes OP-Zeichen) gibt es nur noch über die 🟡 Goldene Ziehung','🔨 OP-Karten können nicht mehr mit Splittern hergestellt werden','📦 Pakete, Truhen, OP-Kiste und Regenbogen-Kiste geben stattdessen starke, normale Karten','Karten, die du schon besitzt, bleiben natürlich erhalten'],'1.1.1':['📖 Neues Tor: „Die verfluchten Sandgräber“ – besiege Nekharion (💎 100 + exklusiver Fluch-Avatar)'],'1.1.0':['☠ 60 neue Fluch-Karten mit neuer Mechanik: Fluchmarken (☠ auf den Monstern)','Effekt-Monster, Empfänger, Fusion, Xyz/Rang, Zauber & Fallen','Update-Geschenk: 💎 100 Kristalle'],'1.0.9':['🧪 Test-Update: Der Update-Knopf funktioniert!','Update-Geschenk: 💎 100 Kristalle'],'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
+const APP_VER='1.5.0';
+const CHANGELOG={'1.5.0':['🪙 Münzwurf vor jedem Duell (Kopf = Gegner, Zahl = du) – der Gewinner wählt, ob er als Erster oder Zweiter anfängt', '🐉 Monster erscheinen jetzt lebendig über ihrer Karte: Beim Beschwören steigen sie aus der Karte auf, in Angriffsposition stehen sie, in Verteidigung gehen sie mit Schutzschild in die Hocke'],'1.4.0':['✨ Lebendige Karten: Monster auf dem Feld atmen, leuchten und funkeln in ihrer Element-Farbe', '⚔️ Neue Angriffs-Animationen passend zum Element (Feuer, Wasser, Wind, Erde, Licht, Finsternis, Göttlich)', '🗼 Neuer Spielmodus Duellturm: 1000 Etagen – oben warten 10 Goldene Token, eine OP-Karte und 💎 1000', '🗃 Im Shop kannst du jetzt fertige Decks kaufen (ohne OP-Karten)'],'1.3.0':['🐼 Neues Pandadeck: 86 Panda-Karten mit 🎋 Bambusmarken, Fusion, Xyz, Spielfeld und Anti-OP-Karten', '🎁 Geschenk für alle: 💎 500 und 🔷 1 Blauer Token'],'1.2.1':['📲 App installieren jetzt gut sichtbar auf der Startseite – mit Anleitung für iPhone, Android und PC', '👥 Startseite zeigt, welche Freunde gerade online sind (mit Einladen-Knopf)', '🟢 Meldung, wenn ein Freund online kommt'],'1.2.0':['🃏 200 neue Karten: Tempelwächter, Odin & Asgard, Schattenjäger, Raritätenjäger und Wüsten-Monster', '🛡 Neu: Schutzsiegel (Tempelwächter) und 💎 Reliktmarken (Schattenjäger)', '📖 3 neue Tore in der Geschichte – mit exklusiven Avataren', '🎪 Erstes Event „Schatzjagd von Asgard“ (5 Tage): 3 Gegner, 💎 1500, 🟡 1 Goldener Token, 🔷 2 Blaue Token und Odin-Avatar'],'1.1.3':['🟡 Goldene Ziehung gibt jetzt garantiert 1 OP-Karte (1 : 131)'],'1.1.2':['⚖️ OP-Karten (rotes OP-Zeichen) gibt es nur noch über die 🟡 Goldene Ziehung','🔨 OP-Karten können nicht mehr mit Splittern hergestellt werden','📦 Pakete, Truhen, OP-Kiste und Regenbogen-Kiste geben stattdessen starke, normale Karten','Karten, die du schon besitzt, bleiben natürlich erhalten'],'1.1.1':['📖 Neues Tor: „Die verfluchten Sandgräber“ – besiege Nekharion (💎 100 + exklusiver Fluch-Avatar)'],'1.1.0':['☠ 60 neue Fluch-Karten mit neuer Mechanik: Fluchmarken (☠ auf den Monstern)','Effekt-Monster, Empfänger, Fusion, Xyz/Rang, Zauber & Fallen','Update-Geschenk: 💎 100 Kristalle'],'1.0.9':['🧪 Test-Update: Der Update-Knopf funktioniert!','Update-Geschenk: 💎 100 Kristalle'],'1.0.8':['🎁 Fehler behoben: Truhen lassen sich wieder richtig öffnen','🔄 Neu: „Updates“ auf der Startseite – neue Versionen selbst laden','🔒 Online-Duelle gegen Freunde nur noch mit der neuesten Version'],'1.0.7':['🥷 90 neue Ninja-Karten inkl. neuer Kartenart: 🔮 Ritualmonster & Ritualzauber','📖 Neues Tor: „Der Schattenpalast der Ninja“ – besiege Kagevaron (💎 100 + exklusiver Ninja-Avatar)','📘 Neue Spielanleitung für alle Spieler (Start → Spielanleitung)','✦ Neuer Prestige-Shop ab Prestige 1: 🌈 OP-Regenbogen-Token, seltene Avatare, Prestige-Hüllen & -Spielfelder','Update-Geschenk: 💎 100 Kristalle'],'1.0.6':['🧟 90 neue Zombie-Karten: Empfänger, Normal, Fusion, Synchro (Resonanz), Rang, Zauber & Fallen','📖 Neues Tor in der Geschichte: „Die Nekropolis der Untoten“ – besiege Totenkönig Varok (💎 100 + exklusiver Zombie-Avatar)','🎨 Shop: Kartenhüllen für dein Deck und neue Spielfelder','🌐 Spielfeldzauber verwandeln jetzt das ganze Spielfeld','Update-Geschenk: 💎 100 Kristalle'],'1.0.5':['✨ 42 neue Rang-Karten: Rang 1–12, Nr. 1–10 und 10 Rang-Zauber (Rang-Aufstieg, Material, Rang 11/12 …)','🔍 Neue Filter in Sammlung & Werkstatt: Kartentyp, Attribut, Typ, Stufe/Rang, Zauber-/Fallenart, OP-Karten und Sortierung','🔷 Blauer Token: OP-Kiste mit Drehrad im Shop (Token & Spezial)','🟡 Goldener Token: Goldene Ziehung – jede Karte hat die gleiche Chance, auch ♾️-Götter','Update-Geschenk: 💎 100 Kristalle'],'1.0.4':['🌍 Neu: Anzeige, wie viele Spieler gerade online sind (Startseite und Duell → Online)','👑 Owner sehen im Profil die Namen aller Spieler, die gerade online sind'],'1.0.3':['⚖️ 10 neue Anti-OP-Karten (5 Zauber, 5 Fallen) – OP-Karten tragen jetzt ein rotes „OP“-Zeichen','👤 Neues Profil: Avatar aus deinen Kartenbildern, Level, Rang und Statistiken (oben links auf deinen Namen tippen)','🎮 Ränge: Spieler und 👑 Owner','Update-Geschenk: 💎 100 Kristalle'],'1.0.2':['👥 Neu: Freundesliste mit Freundescode (Duell → Online)','🟢 Sieh, wer gerade online ist','⚔️ Lade Freunde direkt zum Duell ein – die Einladung erscheint im Spiel','Update-Geschenk: 💎 100 Kristalle'],'1.0.1':['Test-Update: Die Update-Funktion ist jetzt aktiv!','Neu: Versionsnummer auf der Startseite','Update-Geschenk: 💎 100 Kristalle']};
 setTimeout(()=>{try{if(!SAVE.gPanda){SAVE.gPanda=1;addCrystals(500);SAVE.tokB=(SAVE.tokB||0)+1;persist();updCrys();setTimeout(()=>appToast('🐼 <b>Neues Pandadeck!</b> Geschenk für dich: 💎 500 und 🔷 1 Blauer Token',[{l:'Danke!'}]),2500)}}catch(e){}
   try{const v=SAVE.appVer;if(v!==APP_VER){SAVE.appVer=APP_VER;const st=SAVE.stats||{},old=!!v||(st.wins||0)+(st.losses||0)+(st.packs||0)>0;const gift=old&&CHANGELOG[APP_VER]&&APP_VER!=='1.3.0';if(gift)addCrystals(100);persist();updCrys();
   if(old)info(`✨ Update ${APP_VER} installiert!`,`<ul>${(CHANGELOG[APP_VER]||['Verbesserungen']).map(x=>`<li>${x}</li>`).join('')}</ul>`)}}catch(e){}
